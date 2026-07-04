@@ -536,3 +536,41 @@ This file records every user prompt submitted during spec-driven development of 
 - Marked sub-task 5.5 as completed in `tasks.md`.
 
 **User review & changes:** First subagent invocation failed with `No valid token found`; retried and completed successfully. No content changes requested.
+
+---
+
+## Prompt 33 — Commit Task 5 State Machine and Tests
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` asking to commit the current changes — the state machine module, its unit tests, and the three property test files created across sub-tasks 5.1–5.5.
+
+**Kiro output:**
+- Reviewed `git status`: modified `tasks.md` and `kiro-specs/PROMPT_HISTORY.md`; new `server/src/stateMachine.ts`, `server/tests/unit/stateMachine.test.ts`, and three property tests (`stateMachine.property.test.ts`, `stateMachine.invalidTransitions.property.test.ts`, `stateMachine.validTransitionSet.property.test.ts`).
+- Staged the seven task-related paths; left the still-stray `server/prisma/migrations/0_init/` untracked pending a separate user decision (same file previously flagged in Prompt 26).
+- Committed as `7a4548e` with subject `feat(server): state machine module with unit and property tests` and a Conventional Commits body summarising the `Object.hasOwn` inherited-prop guard, the 5x5 unit-test cartesian, and the property coverage (P7, P8, server-side P9).
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 34 — Execute Task 6: Implement Input Validation and Error Handling
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute task 6 from the spec tasks.md — "Implement input validation and error handling". Sub-task 6.1 required an `AppError` class and Express error middleware wired into `server/src/index.ts`; 6.2 required pure validation functions (`validateTicketCreate`, `validateTicketUpdate`, `validateCommentCreate`, `validateTransition`) enforcing the priority enum; 6.3 and 6.4 required property tests for Property 15 (validation errors list all failures) and Property 16 (invalid priority values rejected).
+
+**Kiro output:**
+- Delegated to spec-task-execution subagent.
+- Created `server/src/errors.ts` — `AppError` class (statusCode + field/message error array) and `errorHandler` middleware returning `{ errors: [...] }` for `AppError` instances and `{ error: "Internal server error" }` for anything else (logged server-side).
+- Wired `errorHandler` into `server/src/index.ts`, replacing the earlier placeholder.
+- Created `server/src/validation.ts` — `validateTicketCreate`, `validateTicketUpdate`, `validateCommentCreate`, `validateTransition`, each returning `{ field, message }[]` (empty = valid); priority enum `{Low, Medium, High, Critical}` exported as `PRIORITIES` and enforced across create/update.
+- Created `server/tests/property/validation.errorCollection.property.test.ts` (Property 15, 100 runs) — asserts the returned error set matches the exact set of invalid fields for arbitrary payloads, plus a fixed all-invalid-fields case.
+- Created `server/tests/property/validation.invalidPriority.property.test.ts` (Property 16, 100 runs) — asserts any string outside the enum yields a priority error, and every enum value yields none.
+- Full test suite green: 60/60 passed; `tsc --noEmit` clean.
+- Marked sub-tasks 6.1–6.4 and parent task 6 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.

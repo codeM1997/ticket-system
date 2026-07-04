@@ -53,21 +53,21 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 9: Frontend presents only valid next-status options** (server-side portion — `getValidTransitions` output matches expected sets)
     - **Validates: Requirements 5.8**
 
-- [ ] 6. Implement input validation and error handling
-  - [ ] 6.1 Create `server/src/errors.ts` with `AppError` class and Express error middleware returning `{ errors: [...] }` for 400 and `{ error: "Internal server error" }` for 500
+- [x] 6. Implement input validation and error handling
+  - [x] 6.1 Create `server/src/errors.ts` with `AppError` class and Express error middleware returning `{ errors: [...] }` for 400 and `{ error: "Internal server error" }` for 500
     - Wire middleware into `server/src/index.ts`
     - _Requirements: 9.3, 10.2, 10.3_
 
-  - [ ] 6.2 Create `server/src/validation.ts` with pure functions: `validateTicketCreate`, `validateTicketUpdate`, `validateCommentCreate`, `validateTransition`
+  - [x] 6.2 Create `server/src/validation.ts` with pure functions: `validateTicketCreate`, `validateTicketUpdate`, `validateCommentCreate`, `validateTransition`
     - Each returns list of `{ field, message }` errors (empty = valid)
     - Enforce priority enum {Low, Medium, High, Critical}
     - _Requirements: 9.1, 9.2, 9.4_
 
-  - [ ]* 6.3 Write property test collecting all validation failures
+  - [x] 6.3 Write property test collecting all validation failures
     - **Property 15: Validation errors list all failures**
     - **Validates: Requirements 9.3**
 
-  - [ ]* 6.4 Write property test for invalid priority rejection
+  - [x] 6.4 Write property test for invalid priority rejection
     - **Property 16: Invalid priority values are rejected**
     - **Validates: Requirements 9.4**
 

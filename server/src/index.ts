@@ -1,6 +1,7 @@
-import express, { type NextFunction, type Request, type Response } from "express";
+import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { errorHandler } from "./errors.js";
 
 dotenv.config();
 
@@ -18,12 +19,7 @@ const apiRouter = express.Router();
 
 app.use("/api", apiRouter);
 
-// Error-handling middleware placeholder.
-// Replaced with proper AppError handling + status mapping in task 6.
-app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  console.error(err);
-  res.status(500).json({ error: "Internal server error" });
-});
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
