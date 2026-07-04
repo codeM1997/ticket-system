@@ -20,7 +20,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Add npm scripts: `dev` (tsx watch), `build`, `start`, `test`, `prisma:migrate`, `prisma:seed`
   - _Requirements: 8.1_
 
-- [ ] 3. Define Prisma schema and initial migration
+- [x] 3. Define Prisma schema and initial migration
   - Create `server/prisma/schema.prisma` with `User`, `Ticket`, `Comment` models exactly per design (fields, relations, defaults)
   - Configure SQLite datasource with `DATABASE_URL` from env
   - Run initial migration to generate SQLite DB and Prisma client

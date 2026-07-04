@@ -295,3 +295,88 @@ This file records every user prompt submitted during spec-driven development of 
 - Findings: CORS has no origin restriction (risk, acceptable for local dev, flagged for pre-deploy lockdown); `port` variable mixes string/number types (nit); error middleware placeholder confirmed intentional per task 6 comment.
 
 **User review & changes:** None — findings presented as review feedback only, no code changes requested.
+
+
+---
+
+## Prompt 20 — Commit All Code
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to commit all the code.
+
+**Kiro output:**
+- Verified `server/.env` remained properly excluded via `.gitignore`.
+- Staged all pending changes: `.kiro/skills/pr-review/`, `.kiro/specs/support-ticket-management/tasks.md`, `.nvmrc`, `README.md`, `kiro-specs/PROMPT_HISTORY.md`, `package-lock.json`, `server/.nvmrc`, `server/package.json`, `server/src/index.ts`, `server/tsconfig.json`.
+- Committed with message `feat: backend skeleton, node version pin, pr-review skill, prompt log` (commit `eb61064`).
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 21 — Run Backend Server
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to run the backend code.
+
+**Kiro output:**
+- Started `npm run dev` in `server/` directory — `tsx watch src/index.ts` launched successfully, server listening on port 3006 with live-reload enabled.
+
+**User review & changes:** None.
+
+---
+
+## Prompt 22 — Execute Task 3: Define Prisma Schema and Initial Migration
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute task 3 from the spec tasks.md — "Define Prisma schema and initial migration". Task required creating `server/prisma/schema.prisma` with User, Ticket, Comment models per design, configuring SQLite datasource with `DATABASE_URL` from env, and running initial migration to generate SQLite DB and Prisma client.
+
+**Kiro output:**
+- Created `server/prisma/schema.prisma` with User, Ticket, Comment models matching design exactly (fields, relations, defaults).
+- Adapted to Prisma 7 breaking changes: `url` no longer allowed in schema datasource block; created `server/prisma.config.ts` with `defineConfig` using `datasource.url` from env.
+- Updated generator from `prisma-client-js` to `prisma-client` with explicit output path (`../src/generated/prisma`) per Prisma 7 requirements.
+- Ran `prisma migrate dev --name init` — created `20260704130031_init` migration with all three tables (User, Ticket, Comment) and unique index on User.email.
+- Ran `prisma generate` — generated Prisma client to `server/src/generated/prisma`.
+- Added `server/src/generated/` to `.gitignore`.
+- Marked task 3 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 23 — Review Task 3 Changed Files
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked the `/reviewing-code` skill to review the changed files from task 3 (Prisma schema, prisma.config.ts, .gitignore).
+
+**Kiro output:**
+- Reviewed `server/prisma/schema.prisma`, `server/prisma.config.ts`, and `.gitignore` diff against correctness, maintainability, performance, and best practices.
+- Findings — Must fix: none. Should fix: (1) missing indexes on hot query paths — suggested `@@index([updatedAt])` and `@@index([status])` on Ticket, `@@index([ticketId, createdAt])` on Comment to back Requirements 2.2, 7.2, 6.4; (2) duplicated seed command declared both in `prisma.config.ts` and `server/package.json` — recommended dropping the `prisma.seed` field from package.json to avoid drift. Nits: priority stored as String (enforced in validation layer per design, flagged for reviewer clarity); no explicit `onDelete` on Ticket.creator relation (defaulted to RESTRICT); no fallback for missing DATABASE_URL.
+- Called out what was done well: models match design.md exactly, `status` defaults to "Open" at DB level (Property 1), `assignedTo` nullable and `createdBy` required per design, `@updatedAt` covers Property 5, Prisma 7 config adaptation clean.
+
+**User review & changes:** None — presented as review feedback only, no code changes requested.
+
+---
+
+## Prompt 24 — Apply Review Fixes 1 & 2
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to fix the two "Should fix" items surfaced in the task 3 code review: missing indexes on hot query paths, and duplicated seed command declared in both `prisma.config.ts` and `server/package.json`.
+
+**Kiro output:**
+- Added `@@index([updatedAt])` and `@@index([status])` to Ticket model in `server/prisma/schema.prisma` (backs Requirements 2.2 and 7.2).
+- Added `@@index([ticketId, createdAt])` to Comment model (backs Requirement 6.4).
+- Removed the `prisma.seed` block from `server/package.json` — `prisma.config.ts` remains the sole source of the seed command.
+- Ran `prisma migrate dev --name add_indexes` — created migration `20260704132819_add_indexes` with three CREATE INDEX statements; applied successfully.
+
+**User review & changes:** None — accepted as-is.

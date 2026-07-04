@@ -15,9 +15,6 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "prisma db seed"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "dependencies": {
     "express": "5.2.1",
     "cors": "2.8.6",
