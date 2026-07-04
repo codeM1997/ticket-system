@@ -131,3 +131,64 @@ This file records every user prompt submitted during spec-driven development of 
 - Created an `agentStop` hook (`update-prompt-history`) that fires after every agent turn and instructs the agent to append a new entry to `kiro-specs/PROMPT_HISTORY.md` if the prompt was meaningful.
 
 **User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 10 — Commit Current Changes
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to commit all current uncommitted changes to the git repo.
+
+**Kiro output:**
+- Staged `kiro-specs/` and `.kiro/hooks/` directories.
+- Committed with message `chore: add kiro-specs artifacts, prompt history, and agentStop hook`.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 11 — Git Push
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to push committed changes to GitHub remote.
+
+**Kiro output:**
+- Could not push interactively (terminal requires GitHub PAT input). Instructed user to run `git push` manually in their terminal.
+
+**User review & changes:** None.
+
+---
+
+## Prompt 12 — Execute Task 1: Bootstrap Monorepo
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute task 1 from the spec tasks.md — "Bootstrap monorepo and prompt history". Task required creating `client/` and `server/` directories, a root `package.json` with npm workspaces and delegating `dev`/`build`/`test` scripts, and a `PROMPT_HISTORY.md` at repo root for spec-driven development record.
+
+**Kiro output:**
+- Created root `package.json` with npm workspaces pointing to `client` and `server`; top-level `dev`, `build`, `test` scripts delegate to each workspace.
+- Created `client/package.json` stub.
+- Created `server/package.json` stub.
+- Created `PROMPT_HISTORY.md` at repo root with initial entries documenting the spec creation session and this bootstrap session.
+- Marked task 1 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 13 — Remove Redundant Root PROMPT_HISTORY.md
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User pointed out that maintaining a `PROMPT_HISTORY.md` at repo root is redundant since `kiro-specs/PROMPT_HISTORY.md` already serves that purpose. Asked to remove the root-level file.
+
+**Kiro output:**
+- Deleted `PROMPT_HISTORY.md` from repo root.
+
+**User review & changes:** None — accepted as-is.

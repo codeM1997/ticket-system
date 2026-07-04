@@ -8,7 +8,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
 
 ## Tasks
 
-- [ ] 1. Bootstrap monorepo and prompt history
+- [x] 1. Bootstrap monorepo and prompt history
   - Create `client/` and `server/` directories at repo root
   - Add root `package.json` with workspace config or top-level scripts (`dev`, `build`, `test`) delegating to each package
   - Create `PROMPT_HISTORY.md` at repo root; append every user prompt and short summary of the AI response as spec-driven-development record
