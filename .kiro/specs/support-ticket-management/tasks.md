@@ -71,7 +71,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 16: Invalid priority values are rejected**
     - **Validates: Requirements 9.4**
 
-- [ ] 7. Implement users route
+- [x] 7. Implement users route
   - Create `server/src/routes/users.ts` with `GET /api/users` returning all seeded users (id, name, email, role)
   - Mount router in `server/src/index.ts`
   - _Requirements: 8.3_

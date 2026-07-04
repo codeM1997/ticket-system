@@ -645,3 +645,24 @@ This file records every user prompt submitted during spec-driven development of 
 - `npx vitest run` in `server/`: 6 files, 60/60 tests passed.
 
 **User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 39 — Execute Task 7: Implement Users Route
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute task 7 from the spec tasks.md — "Implement users route". Required creating `server/src/routes/users.ts` with `GET /api/users` returning all seeded users (id, name, email, role), and mounting the router in `server/src/index.ts`.
+
+**Kiro output:**
+- Delegated to spec-task-execution subagent.
+- Created `server/src/prisma.ts` as a shared Prisma client instance (using the `better-sqlite3` driver adapter) for routes to import.
+- Created `server/src/routes/users.ts` — `GET /api/users` selecting `id`, `name`, `email`, `role` via `prisma.user.findMany`, returning `{ users }`, errors forwarded to `next(err)`.
+- Mounted the router at `/api/users` in `server/src/index.ts`.
+- Fixed an unrelated native-module ABI mismatch (`better-sqlite3` built for wrong Node version) via `npm rebuild better-sqlite3` — no code change required.
+- `tsc` build clean, `getDiagnostics` clean, verified live via curl — returns the 3 seeded users correctly.
+- Marked task 7 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.

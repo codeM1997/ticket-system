@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { errorHandler } from "./errors.js";
+import usersRouter from "./routes/users.js";
 
 dotenv.config();
 
@@ -13,9 +14,9 @@ app.use(express.json());
 
 const apiRouter = express.Router();
 
+apiRouter.use("/users", usersRouter);
 // Route modules will be mounted here in later tasks, e.g.:
 // apiRouter.use("/tickets", ticketsRouter);
-// apiRouter.use("/users", usersRouter);
 
 app.use("/api", apiRouter);
 
