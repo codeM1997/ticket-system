@@ -7,8 +7,11 @@ import {
   validateTransition,
 } from "../validation.js";
 import { canTransition } from "../stateMachine.js";
+import commentsRouter from "./comments.js";
 
 const ticketsRouter = Router();
+
+ticketsRouter.use("/:id/comments", commentsRouter);
 
 // POST /api/tickets — create ticket, always starts "Open".
 // Requirements: 1.1, 1.2, 9.1

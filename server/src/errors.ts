@@ -31,6 +31,9 @@ export class AppError extends Error {
  * - AppError instances: respond with `err.statusCode` and `{ errors: [...] }`.
  * - Prisma "record not found" (P2025): respond 404 with `{ errors: [...] }`,
  *   catching cases like PATCH/transition on a deleted or non-existent id.
+ * - Prisma "foreign key constraint failed" (P2003): respond 400 with
+ *   `{ errors: [...] }`, catching TOCTOU races where a referenced record
+ *   (e.g. a ticket) is deleted between an existence check and a write.
  * - Any other error: log server-side and respond 500 with
  *   `{ error: "Internal server error" }`.
  */
@@ -51,6 +54,16 @@ export function errorHandler(
     err.code === "P2025"
   ) {
     res.status(404).json({ errors: [{ field: "id", message: "Not found" }] });
+    return;
+  }
+
+  if (
+    err instanceof Prisma.PrismaClientKnownRequestError &&
+    err.code === "P2003"
+  ) {
+    res
+      .status(400)
+      .json({ errors: [{ field: "id", message: "Referenced record not found" }] });
     return;
   }
 

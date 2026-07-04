@@ -762,3 +762,73 @@ This file records every user prompt submitted during spec-driven development of 
 - `getDiagnostics` on `errors.ts`: clean. `npm test` in `server/`: 8 files, 63/63 tests passed.
 
 **User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 45 — Commit Task 8 and P2025 Fix
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` asking to commit the current changes — task 8's ticket routes, property tests, and the P2025-to-404 fix.
+
+**Kiro output:**
+- Reviewed `git status` — 8 staged paths: `tasks.md`, `PROMPT_HISTORY.md`, `server/src/errors.ts`, `server/src/index.ts`, `server/src/routes/tickets.ts`, two property test files, and the previously-stray `server/prisma/migrations/0_init/migration.sql` (now finally staged, resolving the gap flagged in Prompts 26/33/40).
+- Committed as `aa58bfe` with subject `feat(server): ticket routes, P2025 404 mapping, property tests` and a body summarising the new endpoints, the P2025-to-404 error-middleware mapping, and the three property tests (Properties 1, 2, 3).
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 46 — Execute Task 9: Implement Comment Route
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute task 9 from the spec tasks.md — "Implement comment route". Required `POST /api/tickets/:id/comments` validating `message` (non-empty, trimmed) and `createdBy` (present), returning 201 with the created comment, 400 on validation failure, 404 if the ticket is missing; plus sub-tasks 9.1 and 9.2 for property tests covering Properties 10 and 11.
+
+**Kiro output:**
+- Delegated to spec-task-execution subagent.
+- Created `server/src/routes/comments.ts` — router mounted with `mergeParams: true` under the tickets router at `/:id/comments`, matching the existing router-composition pattern from `tickets.ts`/`index.ts`.
+- Route checks ticket existence first (404 via `AppError` if missing), validates payload via existing `validateCommentCreate`, creates the comment via the shared Prisma client, returns 201 with the full comment object (`id`, `message`, `createdBy`, `ticketId`, `createdAt`).
+- Created `server/tests/property/comment.property.test.ts` — Property 10 (100 runs: any valid non-empty message persists and is retrievable via `GET /api/tickets/:id`) and Property 11 (100 runs each: empty/whitespace-only message returns 400; missing `createdBy` returns 400), tagged consistently with existing property test files.
+- Full server suite green: 9 files, 66 tests passed.
+- Marked sub-tasks 9.1, 9.2, and parent task 9 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 47 — Review Task 9 Comment Route
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked the `/reviewing-code` skill to review the new changes — task 9's comment route, its property tests, and the tickets router wiring.
+
+**Kiro output:**
+- Reviewed `server/src/routes/comments.ts`, `server/tests/property/comment.property.test.ts`, the `tickets.ts` diff mounting `commentsRouter`, `index.ts`, `validation.ts`, and `errors.ts` against correctness, maintainability, performance, type safety, and testing criteria.
+- Findings — Must fix: none. Should fix: (1) TOCTOU gap between the `findUnique` existence check and `prisma.comment.create` — if ticket deleted in between, create throws Prisma P2003 (FK violation), which `errorHandler` doesn't map, falling through to generic 500 instead of 404 (same class of gap flagged on PATCH/transitions in the task 8 review); (2) `createdBy` on comment not validated against real `User` ids, same pre-existing pattern as ticket `assignedTo`/`createdBy`. Nits: Property 11 tests cover missing `createdBy` and empty/whitespace `message` separately but not empty-string `createdBy`; `req.body ?? {}` guard used before validation but not before the destructure right after.
+- Called out what was done well: `mergeParams` router mount mirrors existing composition pattern exactly, validation/404 ordering matches sibling routes, response shape matches design.md, property tests tagged/scoped consistently, full suite green (66/66).
+
+**User review & changes:** None — presented as review feedback only, no code changes applied.
+
+
+---
+
+## Prompt 48 — Fix Task 9 Review Should-Fix Items
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to fix the two "Should fix" items surfaced in the task 9 code review: the TOCTOU gap where a deleted ticket causes an unmapped Prisma P2003 error on comment creation, and the unvalidated `createdBy` on comments not checked against real `User` ids.
+
+**Kiro output:**
+- Updated `server/src/errors.ts` — added a branch in `errorHandler` catching `Prisma.PrismaClientKnownRequestError` with `code === "P2003"`, responding 400 with `{ errors: [{ field: "id", message: "Referenced record not found" }] }`; updated the doc comment to document the new P2003 branch.
+- Updated `server/src/routes/comments.ts` — added a `prisma.user.findUnique` check on `createdBy` before creating the comment, returning 400 with `{ errors: [{ field: "createdBy", message: "createdBy must be a valid user id" }] }` when the user doesn't exist.
+- `getDiagnostics` on both files: clean. `npm test` in `server/`: 9 files, 66/66 tests passed.
+
+**User review & changes:** None — accepted as-is.

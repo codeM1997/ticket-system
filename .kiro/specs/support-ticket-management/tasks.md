@@ -134,28 +134,28 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - On valid transition persist new status and return updated ticket
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-- [ ] 9. Implement comment route
+- [x] 9. Implement comment route
   - Create `POST /api/tickets/:id/comments` in `server/src/routes/comments.ts` (or under tickets router)
   - Validate `message` non-empty (trim whitespace) and `createdBy` present
   - Return 201 with created comment; 400 on validation failure; 404 if ticket missing
   - _Requirements: 6.1, 6.2, 9.2_
 
-  - [ ]* 9.1 Write property test for valid comment creation
+  - [x] 9.1 Write property test for valid comment creation
     - **Property 10: Valid comment creation persists**
     - **Validates: Requirements 6.1**
 
-  - [ ]* 9.2 Write property test for invalid comment rejection
+  - [x] 9.2 Write property test for invalid comment rejection
     - **Property 11: Invalid comment creation yields 400**
     - **Validates: Requirements 6.2, 9.2**
 
 - [ ] 10. Integration tests for state machine over HTTP
-  - [ ]* 10.1 Write supertest suite in `server/tests/integration/stateMachine.integration.test.ts`
+  - [ ] 10.1 Write supertest suite in `server/tests/integration/stateMachine.integration.test.ts`
     - For each valid pair {(Open, In Progress), (Open, Cancelled), (In Progress, Resolved), (In Progress, Cancelled), (Resolved, Closed)}: create ticket via API, drive to `fromStatus`, POST transition, assert 200 and re-fetch ticket to assert persisted status
     - For representative invalid pairs (Open→Resolved, Closed→Open, Cancelled→Open, Resolved→In Progress): create ticket, drive to `fromStatus`, POST transition, assert 400
     - Each test creates its own ticket; no shared state
     - _Requirements: 12.1, 12.2, 12.3_
 
-  - [ ]* 10.2 Write property test for data persistence round trip
+  - [ ] 10.2 Write property test for data persistence round trip
     - **Property 14: Data persistence round trip** (create via API, reconnect Prisma client, re-query, assert equal)
     - **Validates: Requirements 8.4**
 
