@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Update Prompt History",
+  "description": "After every agent response, appends the user prompt and a summary of changes made to kiro-specs/PROMPT_HISTORY.md to maintain spec-driven development audit trail.",
+  "version": "1",
+  "when": {
+    "type": "agentStop"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Review the conversation that just completed. If the user sent a meaningful prompt (not just \"ok\" or trivial acknowledgement), append a new entry to `kiro-specs/PROMPT_HISTORY.md` following the existing format:\n\n```\n---\n\n## Prompt N — [Short Title]\n\n**Date:** [today's date]\n\n**Prompt (summarised):**\n> [1-3 sentence summary of what the user asked]\n\n**Kiro output:**\n- [bullet list of what was generated or changed]\n\n**User review & changes:** [any edits the user requested, or \"None\" if accepted as-is]\n```\n\nIncrement N from the last entry in the file. Only append — never modify existing entries. If the prompt was trivial (e.g. \"ok\", \"understood\", \"thanks\"), skip the update."
+  }
+}
