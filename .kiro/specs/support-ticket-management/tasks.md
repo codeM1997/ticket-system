@@ -76,27 +76,27 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Mount router in `server/src/index.ts`
   - _Requirements: 8.3_
 
-- [ ] 8. Implement ticket routes
-  - [ ] 8.1 Implement `POST /api/tickets` in `server/src/routes/tickets.ts`
+- [x] 8. Implement ticket routes
+  - [x] 8.1 Implement `POST /api/tickets` in `server/src/routes/tickets.ts`
     - Validate payload; on success create ticket with `status: "Open"`; return 201 with full object
     - On validation failure return 400 via `AppError`
     - _Requirements: 1.1, 1.2, 9.1_
 
-  - [ ]* 8.2 Write property test for ticket creation defaults
+  - [x] 8.2 Write property test for ticket creation defaults
     - **Property 1: New tickets always start Open**
     - **Validates: Requirements 1.1**
 
-  - [ ]* 8.3 Write property test for missing required fields
+  - [x] 8.3 Write property test for missing required fields
     - **Property 2: Missing required ticket fields yield 400**
     - **Validates: Requirements 1.2, 9.1**
 
-  - [ ] 8.4 Implement `GET /api/tickets` with optional `search` and `status` query params
+  - [x] 8.4 Implement `GET /api/tickets` with optional `search` and `status` query params
     - Return `{ tickets: [...] }` ordered by `updatedAt` descending
     - Case-insensitive substring match against `title` OR `description` when `search` present
     - Filter by exact `status` when provided; combine both criteria when both present
     - _Requirements: 2.1, 2.2, 7.1, 7.2, 7.3_
 
-  - [ ]* 8.5 Write property test for list ordering
+  - [x] 8.5 Write property test for list ordering
     - **Property 3: Ticket list is ordered by updatedAt descending**
     - **Validates: Requirements 2.2**
 
@@ -104,7 +104,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 13: Search and filter returns only matching tickets**
     - **Validates: Requirements 7.1, 7.2, 7.3**
 
-  - [ ] 8.7 Implement `GET /api/tickets/:id` returning ticket with comments ordered by `createdAt` ascending; 404 when not found
+  - [x] 8.7 Implement `GET /api/tickets/:id` returning ticket with comments ordered by `createdAt` ascending; 404 when not found
     - _Requirements: 3.1, 3.2, 6.4_
 
   - [ ]* 8.8 Write property test for not-found response
@@ -115,7 +115,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 12: Comments are chronologically ordered**
     - **Validates: Requirements 6.4**
 
-  - [ ] 8.10 Implement `PATCH /api/tickets/:id` accepting partial updates (title, description, priority, assignedTo)
+  - [x] 8.10 Implement `PATCH /api/tickets/:id` accepting partial updates (title, description, priority, assignedTo)
     - Validate fields present; reject empty required strings and invalid priority with 400
     - Persist and let Prisma bump `updatedAt`; return full ticket
     - _Requirements: 4.1, 4.2_
@@ -128,7 +128,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 6: Invalid ticket updates yield 400**
     - **Validates: Requirements 4.2**
 
-  - [ ] 8.13 Implement `POST /api/tickets/:id/transitions`
+  - [x] 8.13 Implement `POST /api/tickets/:id/transitions`
     - Load ticket; if not found return 404
     - Validate `toStatus` string; call `canTransition(current, toStatus)`; if false return 400 with `Invalid transition from X to Y`
     - On valid transition persist new status and return updated ticket

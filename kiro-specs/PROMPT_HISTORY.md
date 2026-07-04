@@ -666,3 +666,99 @@ This file records every user prompt submitted during spec-driven development of 
 - Marked task 7 as completed in `tasks.md`.
 
 **User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 40 — Generate Commit Message via caveman-commit Skill
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked the `/caveman-commit` skill asking for a commit message for the currently staged changes (task 7 users route work).
+
+**Kiro output:**
+- Checked `git status`/`git diff --cached --stat` — staged files: `tasks.md`, `kiro-specs/PROMPT_HISTORY.md`, `server/src/index.ts`, `server/src/prisma.ts`, `server/src/routes/users.ts`.
+- Generated Conventional Commits message: `feat(server): add GET /api/users route` with a short body noting the shared Prisma client and mount point.
+- Did not run `git commit` — skill only generates the message; flagged the still-untracked `server/prisma/migrations/0_init/` and asked whether to proceed with committing.
+
+**User review & changes:** Pending — awaiting user decision on whether to run the commit.
+
+
+---
+
+## Prompt 41 — Run the Commit
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to run `git commit` using the message generated in Prompt 40.
+
+**Kiro output:**
+- Ran `git commit -m "feat(server): add GET /api/users route" -m "Shared Prisma client (prisma.ts) with better-sqlite3 adapter, mounted users router at /api/users returning id/name/email/role."`.
+- Commit `69276f4` created: 5 files changed (`tasks.md`, `kiro-specs/PROMPT_HISTORY.md`, `server/src/index.ts`, `server/src/prisma.ts`, `server/src/routes/users.ts`).
+- Flagged `server/prisma/migrations/0_init/` still untracked, pending user decision.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 42 — Execute Task 8: Implement Ticket Routes
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute task 8 from the spec tasks.md — "Implement ticket routes". Required `POST /api/tickets` (create, always "Open"), `GET /api/tickets` (search + status filter, ordered by updatedAt desc), `GET /api/tickets/:id` (with comments, 404 handling), `PATCH /api/tickets/:id` (partial update), `POST /api/tickets/:id/transitions` (state machine enforced), plus required property tests for Properties 1, 2, and 3.
+
+**Kiro output:**
+- Delegated to spec-task-execution subagent (first invocation was cancelled mid-run; verified partial progress before retrying remaining work rather than redoing everything).
+- Created `server/src/routes/tickets.ts` — all five endpoints wired to `validateTicketCreate`/`validateTicketUpdate`/`validateTransition`, `canTransition`, and the shared Prisma client; validation failures and 404s raised via `AppError`.
+- `GET /api/tickets` combines optional `search` (case-insensitive substring on title/description, filtered in JS since SQLite's Prisma client lacks case-insensitive `contains` mode) and `status` (exact match) filters; results ordered by `updatedAt` desc.
+- `GET /api/tickets/:id` includes comments ordered by `createdAt` asc; 404 with `{ errors: [...] }` when missing.
+- `POST /api/tickets/:id/transitions` loads the ticket first (404 if missing), validates `toStatus` shape, then calls `canTransition`; rejects with `Invalid transition from X to Y` on failure.
+- Mounted `ticketsRouter` at `/api/tickets` in `server/src/index.ts`.
+- Created `server/tests/property/ticketCreation.property.test.ts` — Property 1 (100 runs: valid payload always yields status "Open") and Property 2 (100 runs: any payload missing/emptying at least one required field yields 400 with non-empty errors).
+- Created `server/tests/property/ticketList.property.test.ts` — Property 3 (30 runs: create 2–5 tickets via API, assert the full `GET /api/tickets` list has non-increasing `updatedAt` across the whole returned set, not just the run's own tickets).
+- Full server suite green: 8 files, 63 tests passed; `getDiagnostics` clean on all new/modified files.
+- Marked sub-tasks 8.1, 8.2, 8.3, 8.4, 8.5, 8.7, 8.10, 8.13 and parent task 8 as completed in `tasks.md`. Optional sub-tasks 8.6, 8.8, 8.9, 8.11, 8.12 (marked `*`) left unstarted per spec.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 43 — Review Task 8 Ticket Routes
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked the `/reviewing-code` skill to review the server code (task 8's new ticket routes and supporting modules).
+
+**Kiro output:**
+- Reviewed `server/src/routes/tickets.ts`, `users.ts`, `errors.ts`, `validation.ts`, `stateMachine.ts`, `index.ts`, `prisma.ts`, and `schema.prisma` against correctness, maintainability, performance, type safety, and testing criteria.
+- Findings — Must fix: `PATCH /api/tickets/:id` skips the `findUnique` existence guard used by every sibling route, so updating a non-existent id throws Prisma's `P2025` error which falls through to the generic 500 handler instead of 404 (design doc calls for P2025 to map to 404; unimplemented anywhere); same TOCTOU gap flagged on the transition route's second `update` call.
+- Should fix: `GET /api/tickets` search loads the full ticket table into memory before JS-filtering (fine at seed scale, flagged for future pagination work); `validateTicketUpdate` still uses `field: "_"` for the empty-payload case (same issue raised in the task 6 review, different validator); five duplicated try/catch/`next(err)` blocks in `tickets.ts` suggested for an `asyncHandler` wrapper.
+- Nits: `assignedTo` on PATCH isn't checked against real `User` ids, so an unknown assignee passes validation and fails later at the DB layer with the same unhandled-P2025-class error; noted the prototype-pollution guard in `stateMachine.ts` and injection-safe string interpolation in the transition error message as fine as-is.
+- Called out what was done well: `POST /api/tickets` hardcodes `status: "Open"` server-side (Property 1 protected at the code level, not just by tests); validation-before-mutation ordering consistent across create/update/transition; ordering delegated to indexed Prisma `orderBy` rather than hand-rolled sort; uniform `{ errors: [{ field, message }] }` shape across validation and not-found cases.
+- Offered to apply the P2025-to-404 fix; awaiting user decision.
+
+**User review & changes:** None — presented as review feedback only, no code changes applied yet.
+
+
+---
+
+## Prompt 44 — Fix Review Finding 1 (P2025 to 404 Mapping)
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to fix the first "Must fix" item from the task 8 code review — `PATCH /api/tickets/:id` (and the TOCTOU window on the transitions route) throwing an unhandled Prisma `P2025` error instead of returning 404 when the ticket doesn't exist.
+
+**Kiro output:**
+- Updated `server/src/errors.ts` to import `Prisma` from `./generated/prisma/client.js` and added a check in `errorHandler` catching `Prisma.PrismaClientKnownRequestError` with `code === "P2025"`, responding 404 with `{ errors: [{ field: "id", message: "Not found" }] }` before falling through to the generic 500 handler.
+- Updated the middleware's doc comment to document the new P2025 branch.
+- Fix applied centrally in the middleware, covering both the PATCH route's missing existence guard and the transitions route's TOCTOU gap in one place rather than duplicating `findUnique` guards.
+- `getDiagnostics` on `errors.ts`: clean. `npm test` in `server/`: 8 files, 63/63 tests passed.
+
+**User review & changes:** None — accepted as-is.
