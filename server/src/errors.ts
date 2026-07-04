@@ -1,17 +1,22 @@
 import type { NextFunction, Request, Response } from "express";
+import type { ValidationError } from "./validation.js";
 
 /**
  * Represents a client-facing error with an HTTP status code and one or
- * more field-level (or general) error messages.
+ * more field-level error messages.
+ *
+ * The `errors` payload uses the same `ValidationError` shape emitted by
+ * the validation module so response bodies have a single, guaranteed
+ * `{ field, message }` contract for the frontend to bind against.
  *
  * Example:
  *   throw new AppError(400, [{ field: "title", message: "Title is required" }]);
  */
 export class AppError extends Error {
   public statusCode: number;
-  public errors: Array<{ field?: string; message: string }>;
+  public errors: ValidationError[];
 
-  constructor(statusCode: number, errors: Array<{ field?: string; message: string }>) {
+  constructor(statusCode: number, errors: ValidationError[]) {
     super(errors.map((e) => e.message).join(", "));
     this.name = "AppError";
     this.statusCode = statusCode;

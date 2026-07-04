@@ -574,3 +574,74 @@ This file records every user prompt submitted during spec-driven development of 
 - Marked sub-tasks 6.1–6.4 and parent task 6 as completed in `tasks.md`.
 
 **User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 35 — Commit Task 6 Changes
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` asking to commit the changes from task 6 — the validation module, error handling middleware, and two property test files.
+
+**Kiro output:**
+- Staged 7 paths: `server/src/errors.ts`, `server/src/validation.ts`, `server/src/index.ts`, two property tests, `tasks.md`, `PROMPT_HISTORY.md`.
+- Left stray `server/prisma/migrations/0_init/` untracked (previously flagged in Prompt 26 and 33).
+- Committed as `eb34871` with subject `feat(server): input validation module, error handling, and property tests (P15, P16)` and body summarising the changes and test status (60/60 pass).
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 36 — Review Task 6 Changed Files
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked the `/reviewing-code` skill to review the changed files from task 6 (`server/src/errors.ts`, `server/src/validation.ts`, `server/src/index.ts` wire, and the two property tests).
+
+**Kiro output:**
+- Reviewed the five task 6 files against correctness, maintainability, performance, type safety, and testing criteria.
+- Findings — Must fix: none. Should fix: (1) `server/src/index.ts` calls `app.listen(...)` on module import, which will collide with supertest in task 10.1; recommended splitting `app` export from `listen()` invocation (guarded entry point or separate `bin/server.ts`); (2) type drift between `AppError.errors: Array<{ field?: string; message: string }>` and `ValidationError = { field: string; message: string }` — recommended unifying on a single source of truth so response body shape is guaranteed for the frontend.
+- Nits: `validateTicketUpdate` uses `field: "_"` for the zero-fields case (frontend can't bind that to an input; suggested `"body"` or omitting the field); Property 16 generator `fc.string()` includes empty string which routes through the "priority required" branch rather than the enum-mismatch branch (suggested `fc.string({ minLength: 1 })` to isolate); no property tests yet for `validateTicketUpdate`/`validateCommentCreate`/`validateTransition` (scope-correct — flagged for tasks 8/9); `AppError`'s `instanceof` fine at current tsconfig target but would break under ES5 without a `Object.setPrototypeOf` shim.
+- Called out what was done well: `unknown` typing on all inputs (no `as any`), `Object.prototype.hasOwnProperty.call` correctly distinguishes "absent" from "undefined" in update, distinct priority messages for required-vs-enum, `instanceof AppError` (subclass-safe) in middleware, Property 15 uses an independent oracle rather than mirroring the impl.
+
+**User review & changes:** None — presented as review feedback only, no code changes requested.
+
+
+---
+
+## Prompt 37 — Recommended Fix for Review Finding 2 (Error Shape Unification)
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked for the recommended fix for the second "Should fix" item from the task 6 code review — the type drift between `AppError.errors: Array<{ field?: string; message: string }>` in `server/src/errors.ts` and `ValidationError = { field: string; message: string }` in `server/src/validation.ts`.
+
+**Kiro output:**
+- Proposed making `ValidationError` the single source of truth: `errors.ts` imports `ValidationError` and types `AppError.errors: ValidationError[]`, guaranteeing every 400 response body entry has `field: string` for the frontend to bind directly to form fields.
+- Noted the trade-off: 404/500 responses use `{ error: "..." }` (not `{ errors: [...] }`), so no current non-field 400 usage exists; future non-field 400 cases (rate-limit, auth) can be modelled by extending the shape or adding a second error class then.
+- Offered a weaker alternative — keep `field?` optional on both by widening `ValidationError` — but recommended the stricter option since all four current validators always set `field`.
+- Asked user whether to apply the change.
+
+**User review & changes:** Pending — awaiting user decision on whether to apply.
+
+
+---
+
+## Prompt 38 — Apply Recommended Fix for Review Finding 2
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to apply the recommended (stricter) fix for review finding 2 — unify the error shape between `AppError` and `ValidationError`.
+
+**Kiro output:**
+- Updated `server/src/errors.ts` to import `ValidationError` from `./validation.js` and type `AppError.errors` as `ValidationError[]` (dropping the widened `Array<{ field?: string; message: string }>`).
+- Updated the class doc comment to explain the single-source-of-truth contract.
+- `getDiagnostics` on `errors.ts` and `validation.ts`: clean.
+- `npx vitest run` in `server/`: 6 files, 60/60 tests passed.
+
+**User review & changes:** None — accepted as-is.
