@@ -399,3 +399,140 @@ This file records every user prompt submitted during spec-driven development of 
 - Marked task 4 as completed in `tasks.md`.
 
 **User review & changes:** User flagged that the initial run was under Node v22 instead of the pinned v20.19.0; Kiro re-ran under the correct version via `nvm use` before proceeding to install the driver adapter.
+
+---
+
+## Prompt 26 — Commit Task 4 Changes
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` asking to commit the code from task 4 (seed script implementation).
+
+**Kiro output:**
+- Reviewed `git status` — 4 modified files (tasks.md, PROMPT_HISTORY.md, package-lock.json, server/package.json) plus new `server/prisma/seed.ts` and an untracked stray `server/prisma/migrations/0_init/` directory.
+- Staged only the task 4 files (seed script, package.json, package-lock.json, tasks.md, PROMPT_HISTORY.md); left the stray `0_init/` migration untracked pending user decision since it was not part of this task.
+- Committed as `d88d7aa` with message `feat(server): seed users via prisma with better-sqlite3 adapter` and a body explaining the Prisma 7 driver-adapter requirement and idempotent upsert.
+- Flagged the untracked `server/prisma/migrations/0_init/` to the user for follow-up.
+
+**User review & changes:** None — commit accepted; stray migration folder still to be resolved.
+
+---
+
+## Prompt 27 — Execute Task 5: Implement State Machine Module
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute task 5 from the spec tasks.md — "Implement state machine module". Sub-task 5.1 required creating `server/src/stateMachine.ts` with a `VALID_TRANSITIONS` map and `canTransition(from, to)` / `getValidTransitions(current)` functions per the design's exact transition table. Optional test sub-tasks 5.2–5.5 (marked `*`) were skipped.
+
+**Kiro output:**
+- Created `server/src/stateMachine.ts` exporting `VALID_TRANSITIONS`, `canTransition`, and `getValidTransitions`.
+- Transitions match design exactly: Open→[In Progress, Cancelled], In Progress→[Resolved, Cancelled], Resolved→[Closed], Closed and Cancelled terminal.
+- Unknown source statuses handled via optional chaining, returning `false` from `canTransition` and `[]` from `getValidTransitions`.
+- Module is standalone; not yet wired into routes (that's task 8.13).
+- Marked sub-task 5.1 and parent task 5 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 28 — Execute Task 5.2: Unit Tests for State Machine
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute sub-task 5.2 from the spec tasks.md — "Write unit tests for state machine (`server/tests/unit/stateMachine.test.ts`)". Table-driven tests over all (from, to) pairs, validating Requirements 5.1–5.6.
+
+**Kiro output:**
+- Created `server/tests/unit/stateMachine.test.ts` using vitest with ESM `.js` import per NodeNext moduleResolution.
+- Verified `VALID_TRANSITIONS` shape and per-status expected set via `it.each`.
+- Table-driven cartesian product of all 25 (from, to) pairs across {Open, In Progress, Resolved, Closed, Cancelled}: 5 valid pairs assert `true` (Reqs 5.1–5.5); 20 invalid pairs assert `false` (Req 5.6) — includes self-transitions, backwards (Closed→Open), and cross transitions (Cancelled→Resolved).
+- Edge cases for unknown/malformed source status (empty string, wrong case, trailing whitespace) — all return `false` / `[]`.
+- Cross-check that `getValidTransitions` agrees with `canTransition` for every combination.
+- `npm test` in `server/` — 1 file, 44 tests passed.
+- Marked sub-task 5.2 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 29 — Execute Task 5.3: Property Test for Valid Transitions
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute sub-task 5.3 from the spec tasks.md — "Write property test for valid transitions". Encodes Property 7 (valid state machine transitions succeed) validating Requirements 5.1–5.5.
+
+**Kiro output:**
+- Created `server/tests/property/stateMachine.property.test.ts` using `fast-check` + vitest, tagged `// Feature: support-ticket-management, Property 7: Valid state machine transitions succeed`.
+- Three fast-check properties at `numRuns: 100` each, all sampled from the exact valid pair set {(Open, In Progress), (Open, Cancelled), (In Progress, Resolved), (In Progress, Cancelled), (Resolved, Closed)}:
+  1. `canTransition(from, to)` returns `true` for every sampled pair.
+  2. `getValidTransitions(from)` contains `to` for every sampled pair.
+  3. Alternative generator: pick from-status with valid targets via `chain`, draw `to` from `getValidTransitions(from)`, both assertions hold.
+- Scope kept to pure state-machine logic; HTTP/Prisma persistence deferred to task 10.1.
+- `getDiagnostics` clean; `vitest run` — 3 tests passed.
+- Marked sub-task 5.3 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 30 — Execute Task 5.4: Property Test for Invalid Transitions
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute sub-task 5.4 from the spec tasks.md — "Write property test for invalid transitions". Encodes Property 8 (invalid state machine transitions are rejected) validating Requirement 5.6.
+
+**Kiro output:**
+- Created `server/tests/property/stateMachine.invalidTransitions.property.test.ts` using `fast-check` + vitest, tagged `// Feature: support-ticket-management, Property 8: Invalid state machine transitions are rejected`.
+- Four properties: (1) guard test asserting the local invalid-pair generator is the exact complement of `VALID_TRANSITIONS` — so widening the valid set in prod code fails the test; (2) `canTransition` returns `false` for every pair in the 20-pair invalid complement over the 5 known statuses; (3) `canTransition` returns `false` when either endpoint is an arbitrary unknown status string; (4) broad `fc.string` × `fc.string` generator at 200 runs, filtered against the valid set via `fc.pre`.
+- Property 4 caught a real bug: `canTransition("toString", "")` threw `TypeError: VALID_TRANSITIONS[from]?.includes is not a function` because `VALID_TRANSITIONS["toString"]` resolved to the inherited `Object.prototype.toString` (a function). Optional chaining only guards `null`/`undefined`, not prototype leakage.
+- Fixed `server/src/stateMachine.ts`: replaced optional-chain lookups in `canTransition` and `getValidTransitions` with explicit `Object.hasOwn(VALID_TRANSITIONS, key)` guards so any inherited key (`toString`, `hasOwnProperty`, `constructor`, etc.) returns the safe default (`false` / `[]`).
+- Full test suite green: 3 files, 51 tests passed.
+- Marked sub-task 5.4 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 31 — Re-run Task 5.4: Verify Property Test for Invalid Transitions
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute sub-task 5.4 again. The test file `server/tests/property/stateMachine.invalidTransitions.property.test.ts` was already written in Prompt 30 but sub-task 5.4 was still marked `[-]` (in-progress) in tasks.md.
+
+**Kiro output:**
+- Delegated to spec-task-execution subagent, which inspected the existing file and confirmed the four-property fast-check suite (guard test, invalid-pair complement over known statuses, unknown-status endpoints, broad string×string with `fc.pre` filter) already matched Property 8 / Requirement 5.6.
+- Ran `npx vitest run tests/property/stateMachine.invalidTransitions.property.test.ts` — 4/4 passed in 373ms.
+- `getDiagnostics` clean.
+- No changes to state machine implementation or test file needed.
+- Flipped sub-task 5.4 from in-progress to completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 32 — Execute Task 5.5: Property Test for Valid-Transition Set Exposure
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute sub-task 5.5 from the spec tasks.md — "Write property test for valid-transition set exposure". Encodes the server-side portion of Property 9 (frontend presents only valid next-status options) validating Requirement 5.8; the client-side portion is deferred to task 18.1.
+
+**Kiro output:**
+- Delegated to spec-task-execution subagent.
+- Created `server/tests/property/stateMachine.validTransitionSet.property.test.ts` using `fast-check` + vitest, tagged `// Feature: support-ticket-management, Property 9: Frontend presents only valid next-status options`.
+- Declared `EXPECTED_TRANSITIONS` independently of `VALID_TRANSITIONS` inside the test file, so any drift or mutation of the source-of-truth map is caught rather than passively mirrored.
+- Five test cases (100 runs each for the fast-check properties):
+  1. `VALID_TRANSITIONS` keys equal the full status set — guards against reference-map drift.
+  2. `getValidTransitions(status)` returns exactly the expected set for every known status — set equality and length checked.
+  3. Returned array has no duplicate entries.
+  4. Every exposed target is itself a known status (no leakage of stray labels).
+  5. Unknown status strings return `[]` — fast-check `fc.string` generator filtered against the known-status set.
+- Full test suite green: 4 files, 56 tests passed.
+- Marked sub-task 5.5 as completed in `tasks.md`.
+
+**User review & changes:** First subagent invocation failed with `No valid token found`; retried and completed successfully. No content changes requested.

@@ -1,4 +1,4 @@
-# Implementation Plan: Support Ticket Management
+ # Implementation Plan: Support Ticket Management
 
 Convert the feature design into a series of prompts for a code-generation LLM that will implement each step with incremental progress. Make sure that each prompt builds on the previous prompts, and ends with wiring things together. There should be no hanging or orphaned code that isn't integrated into a previous step. Focus ONLY on tasks that involve writing, modifying, or testing code.
 
@@ -32,24 +32,24 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Verify seed runs idempotently (upsert on email)
   - _Requirements: 8.3_
 
-- [ ] 5. Implement state machine module
-  - [ ] 5.1 Create `server/src/stateMachine.ts` with `VALID_TRANSITIONS` map, `canTransition(from, to)`, `getValidTransitions(current)`
+- [x] 5. Implement state machine module
+  - [x] 5.1 Create `server/src/stateMachine.ts` with `VALID_TRANSITIONS` map, `canTransition(from, to)`, `getValidTransitions(current)`
     - Include exact transitions from design: Open→[In Progress, Cancelled], In Progress→[Resolved, Cancelled], Resolved→[Closed], Closed→[], Cancelled→[]
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-  - [ ]* 5.2 Write unit tests for state machine (`server/tests/unit/stateMachine.test.ts`)
+  - [x] 5.2 Write unit tests for state machine (`server/tests/unit/stateMachine.test.ts`)
     - Table-driven tests over all (from, to) pairs
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6_
 
-  - [ ]* 5.3 Write property test for valid transitions
+  - [x] 5.3 Write property test for valid transitions
     - **Property 7: Valid state machine transitions succeed**
     - **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
 
-  - [ ]* 5.4 Write property test for invalid transitions
+  - [x] 5.4 Write property test for invalid transitions
     - **Property 8: Invalid state machine transitions are rejected**
     - **Validates: Requirements 5.6**
 
-  - [ ]* 5.5 Write property test for valid-transition set exposure
+  - [x] 5.5 Write property test for valid-transition set exposure
     - **Property 9: Frontend presents only valid next-status options** (server-side portion — `getValidTransitions` output matches expected sets)
     - **Validates: Requirements 5.8**
 
