@@ -380,3 +380,22 @@ This file records every user prompt submitted during spec-driven development of 
 - Ran `prisma migrate dev --name add_indexes` — created migration `20260704132819_add_indexes` with three CREATE INDEX statements; applied successfully.
 
 **User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 25 — Execute Task 4: Implement Seed Script
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute task 4 from the spec tasks.md — "Implement seed script". Task required creating `server/prisma/seed.ts` inserting at least 3 seeded users with realistic name/email/role, registering the seed command in `server/package.json` under `prisma.seed`, and verifying idempotency via upsert on email.
+
+**Kiro output:**
+- Wrote `server/prisma/seed.ts` upserting 3 users (Alice Johnson/admin, Bob Smith/agent, Carol Williams/agent) keyed on `email`.
+- Corrected the Prisma client import to the schema's custom output path (`../src/generated/prisma/client.js`) instead of `@prisma/client`.
+- Registered `prisma.seed: "tsx prisma/seed.ts"` in `server/package.json` (Prisma 7 also picks it up from `prisma.config.ts`; kept both to satisfy the task's literal requirement).
+- Diagnosed and fixed a Prisma 7 driver-adapter requirement: `PrismaClient needs to be constructed with a non-empty, valid PrismaClientOptions` — installed `@prisma/adapter-better-sqlite3`, `better-sqlite3`, and `@types/better-sqlite3`; instantiated `PrismaClient` with `new PrismaBetterSqlite3({ url })` adapter.
+- Ran `npm run prisma:seed` twice under pinned Node v20.19.0; verified DB still contains exactly 3 users (idempotent upsert).
+- Marked task 4 as completed in `tasks.md`.
+
+**User review & changes:** User flagged that the initial run was under Node v22 instead of the pinned v20.19.0; Kiro re-ran under the correct version via `nvm use` before proceeding to install the driver adapter.

@@ -26,7 +26,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Run initial migration to generate SQLite DB and Prisma client
   - _Requirements: 8.1, 8.2_
 
-- [ ] 4. Implement seed script
+- [x] 4. Implement seed script
   - Create `server/prisma/seed.ts` inserting at least 3 seeded users with realistic name/email/role
   - Register seed command in `server/package.json` under `prisma.seed`
   - Verify seed runs idempotently (upsert on email)
