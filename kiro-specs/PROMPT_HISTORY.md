@@ -192,3 +192,106 @@ This file records every user prompt submitted during spec-driven development of 
 - Deleted `PROMPT_HISTORY.md` from repo root.
 
 **User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 14 — Commit Current Changes
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to commit all current uncommitted changes to the git repo.
+
+**Kiro output:**
+- Staged `client/`, `server/`, `package.json`, updated `tasks.md`, and `kiro-specs/PROMPT_HISTORY.md`.
+- Committed with message `chore: bootstrap monorepo, remove redundant root PROMPT_HISTORY, update tasks and prompt log`.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 15 — Fix Stuck npm install by Pinning Node Version
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User reported `npm install` in `server/` appeared stuck and asked to switch to Node v20.11.1 via `nvm use`, pin that version in `package.json`, and update the README accordingly.
+
+**Kiro output:**
+- Killed the stuck background `npm install` process.
+- Discovered Node v20.11.1 is incompatible with pinned `prisma`/`@prisma/client` 7.8.0 (requires Node 20.19+, 22.12+, or 24+); flagged this to the user.
+- User chose to use Node v20.19.0 instead (closest compatible LTS) rather than downgrading Prisma.
+- Installed Node v20.19.0 via `nvm install`/`nvm use`.
+- Added `.nvmrc` (root and `server/`) pinning `20.19.0`.
+- Added `engines.node: "20.19.0"` to `server/package.json`.
+- Created root `README.md` with a Prerequisites section documenting the required Node version and `nvm use` setup step.
+- Re-ran `npm install` in `server/` successfully under Node v20.19.0.
+
+**User review & changes:** User asked for v20.11.1; Kiro substituted v20.19.0 due to a hard Prisma engine requirement, confirmed with user before proceeding.
+
+
+---
+
+## Prompt 16 — Execute Task 2: Set Up Backend Project Skeleton
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to execute task 2 from the spec tasks.md — "Set up backend project skeleton". Task required initializing `server/` with `package.json`, `tsconfig.json`, TypeScript, Express, Prisma, vitest, supertest, fast-check, cors, dotenv; creating `server/src/index.ts` with Express app, JSON middleware, CORS, `/api` router mount, and error middleware placeholder; and npm scripts `dev`/`build`/`start`/`test`/`prisma:migrate`/`prisma:seed`.
+
+**Kiro output:**
+- Verified `server/package.json` already had all required deps (express, cors, dotenv, @prisma/client, typescript, tsx, prisma, vitest, supertest, fast-check) and all required scripts.
+- Verified `server/tsconfig.json` correctly configured (NodeNext, strict, outDir/rootDir set).
+- Verified `server/src/index.ts` already implements Express app with JSON middleware, CORS, `/api` router mount, and error middleware placeholder.
+- Confirmed dependencies installed (hoisted to root `node_modules` via npm workspaces).
+- Ran `npm run build --workspace=server` — passed cleanly with no errors.
+- Marked task 2 as completed in `tasks.md`.
+
+**User review & changes:** None — skeleton was already in place from prior work and matched spec exactly; accepted as-is.
+
+
+---
+
+## Prompt 17 — Create .env File with Custom Port
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to create a `.env` file for the server, setting `PORT` to 3006.
+
+**Kiro output:**
+- Verified `.env` already excluded via root `.gitignore`.
+- Created `server/.env` with `PORT=3006` and `DATABASE_URL="file:./dev.db"` (needed ahead of Prisma setup in task 3).
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 18 — Create Pr-review Skill
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User asked to create a new skill named "Pr-review" (`reviewing-code`) for performing thorough code reviews focused on correctness, maintainability, performance, and best practices, with a defined steps process and severity-based feedback format.
+
+**Kiro output:**
+- Created `.kiro/skills/pr-review/SKILL.md` with frontmatter (`name: reviewing-code`, description) and a 7-step review process: understand the change, check correctness, check maintainability, check performance, check type safety, check testing, provide severity-tiered feedback (must fix/should fix/nit).
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 19 — Review Server Code
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked the `/reviewing-code` skill to review the server code.
+
+**Kiro output:**
+- Reviewed `server/src/index.ts` (only real source file at this stage) against correctness, maintainability, performance, type safety, and testing criteria.
+- Findings: CORS has no origin restriction (risk, acceptable for local dev, flagged for pre-deploy lockdown); `port` variable mixes string/number types (nit); error middleware placeholder confirmed intentional per task 6 comment.
+
+**User review & changes:** None — findings presented as review feedback only, no code changes requested.

@@ -1,5 +1,39 @@
 {
   "name": "support-ticket-server",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "20.19.0"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest run",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "prisma db seed"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "express": "5.2.1",
+    "cors": "2.8.6",
+    "dotenv": "17.4.2",
+    "@prisma/client": "7.8.0"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "@types/express": "5.0.6",
+    "@types/cors": "2.8.19",
+    "@types/node": "26.1.0",
+    "tsx": "4.23.0",
+    "prisma": "7.8.0",
+    "vitest": "4.1.9",
+    "supertest": "7.2.2",
+    "@types/supertest": "7.2.0",
+    "fast-check": "4.8.0"
+  }
 }

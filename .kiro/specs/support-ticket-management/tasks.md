@@ -14,7 +14,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Create `PROMPT_HISTORY.md` at repo root; append every user prompt and short summary of the AI response as spec-driven-development record
   - _Requirements: 11.1_
 
-- [ ] 2. Set up backend project skeleton
+- [x] 2. Set up backend project skeleton
   - Initialize `server/` with `package.json`, `tsconfig.json`, TypeScript, Express, Prisma, vitest, supertest, fast-check, cors, dotenv
   - Create `server/src/index.ts` with Express app, JSON middleware, CORS, `/api` router mount, and error middleware placeholder
   - Add npm scripts: `dev` (tsx watch), `build`, `start`, `test`, `prisma:migrate`, `prisma:seed`
