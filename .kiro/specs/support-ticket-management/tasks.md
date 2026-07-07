@@ -175,7 +175,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Centralize error parsing: throw typed error containing HTTP status and parsed body
   - _Requirements: 10.1, 10.2, 10.3_
 
-- [ ] 14. Implement React Query hooks
+- [x] 14. Implement React Query hooks
   - Create `client/src/hooks/useTickets.ts` exposing `useTicketList(filters)`, `useTicket(id)`, `useCreateTicket`, `useUpdateTicket`, `useTransitionTicket`, `useAddComment`, `useUsers`
   - Invalidate list and detail queries on mutations so UI refreshes without reload
   - _Requirements: 1.3, 4.3, 6.3_

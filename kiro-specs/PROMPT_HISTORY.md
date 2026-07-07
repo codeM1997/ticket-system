@@ -1122,3 +1122,56 @@ This file records every user prompt submitted during spec-driven development of 
 - Generated Conventional Commits message: `feat(client): add frontend types, API client, and fix proxy port` with body listing shared TS types, fetch wrappers with ApiError, Content-Type conditional, and proxy port correction.
 
 **User review & changes:** None — message provided for user to paste.
+
+
+---
+
+## Prompt 66 — Commit Task 13 + Review Fixes
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User asked to git commit all staged changes with the commit message from Prompt 65.
+
+**Kiro output:**
+- Staged all files and committed as `8bea30f` with message `feat(client): add frontend types, API client, and fix proxy port`.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 67 — Execute Task 14: Implement React Query Hooks
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User asked to execute task 14 from the spec tasks.md — "Implement React Query hooks". Task required creating `client/src/hooks/useTickets.ts` exposing `useTicketList(filters)`, `useTicket(id)`, `useCreateTicket`, `useUpdateTicket`, `useTransitionTicket`, `useAddComment`, `useUsers`, with mutations invalidating list and detail queries so UI refreshes without reload.
+
+**Kiro output:**
+- Delegated to spec-task-execution subagent.
+- Created `client/src/hooks/useTickets.ts` with a query key factory (`ticketKeys`, `userKeys`) and all 7 hooks built on `@tanstack/react-query`.
+- `useTicketList(filters)` and `useTicket(id)` implemented as `useQuery` keyed by filters/id; `useUsers` as `useQuery` for the user list.
+- `useCreateTicket` invalidates the ticket list on success; `useUpdateTicket` and `useTransitionTicket` invalidate both list and the specific ticket detail; `useAddComment` invalidates the ticket detail (comments are nested in ticket detail response).
+- `getDiagnostics` clean; `@tanstack/react-query` dependency confirmed present in `client/package.json`.
+- Marked task 14 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 68 — Code Review: Task 14 React Query Hooks
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User invoked `/caveman-review` asking to review the generated code — scoped to `client/src/hooks/useTickets.ts` (task 14 output) against the API client and shared types.
+
+**Kiro output:**
+- Reviewed `useTickets.ts` against `api/tickets.ts` and `types/index.ts`.
+- Findings: 🟡 `useCreateTicket` invalidates raw `["tickets"]` literal instead of going through the `ticketKeys` factory — key duplication; 🔵 `useUpdateTicket`/`useTransitionTicket` invalidate both `["tickets"]` and `ticketKeys.detail(id)` — redundant since the list-key invalidation already prefix-matches the detail key; 🔵 filter type `{ search?: string; status?: string }` duplicated across `useTicketList`, `ticketKeys.list`, and `listTickets` instead of one shared `TicketFilters` type; 🔵 `ticketKeys` factory lacks an `all` base key that would tidy the redundant invalidate calls.
+- No correctness bugs — mutation payload shapes match API client signatures exactly, `useAddComment` correctly invalidates detail-only (comments don't touch ticket `updatedAt`), `getDiagnostics` already clean.
+- Asked user whether to apply the suggested fixes (add `ticketKeys.all`, shared `TicketFilters` type, drop redundant invalidate call).
+
+**User review & changes:** None yet — review findings presented only, awaiting user decision on whether to apply fixes.
