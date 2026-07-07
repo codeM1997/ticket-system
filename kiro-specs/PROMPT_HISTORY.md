@@ -1175,3 +1175,21 @@ This file records every user prompt submitted during spec-driven development of 
 - Asked user whether to apply the suggested fixes (add `ticketKeys.all`, shared `TicketFilters` type, drop redundant invalidate call).
 
 **User review & changes:** None yet — review findings presented only, awaiting user decision on whether to apply fixes.
+
+---
+
+## Prompt 69 — Execute Task 15: Implement Shared UI Components
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User asked to execute task 15 from the spec tasks.md — "Implement shared UI components". Sub-task 15.1 required `ErrorMessage.tsx` with `role="alert"`, WCAG 2.1 AA compliant contrast, and distinct visual styling. Sub-task 15.2 required `StatusBadge.tsx` mapping each ticket status to a color-coded label.
+
+**Kiro output:**
+- Reviewed existing `types/index.ts`, `api/tickets.ts`, and `hooks/useTickets.ts` for conventions before implementing.
+- Created `client/src/components/ErrorMessage.tsx` — accepts a `message` prop, renders `null` when empty, uses `role="alert"` for screen-reader announcement, red-on-light-red palette (~7:1 contrast ratio) satisfying WCAG 2.1 AA, with a warning icon marked `aria-hidden`.
+- Created `client/src/components/StatusBadge.tsx` — maps each `Status` enum value (`Open`, `In Progress`, `Resolved`, `Closed`, `Cancelled`) to a distinct background/foreground color pair, rendered as a pill-style badge.
+- `getDiagnostics` clean on both files; `tsc --noEmit` passed with no errors.
+- Marked sub-tasks 15.1, 15.2, and parent task 15 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.

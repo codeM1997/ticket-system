@@ -180,11 +180,11 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Invalidate list and detail queries on mutations so UI refreshes without reload
   - _Requirements: 1.3, 4.3, 6.3_
 
-- [ ] 15. Implement shared UI components
-  - [ ] 15.1 `ErrorMessage.tsx` with `role="alert"`, WCAG 2.1 AA compliant contrast, distinct visual styling
+- [x] 15. Implement shared UI components
+  - [x] 15.1 `ErrorMessage.tsx` with `role="alert"`, WCAG 2.1 AA compliant contrast, distinct visual styling
     - _Requirements: 10.1, 10.2, 10.3, 10.4_
 
-  - [ ] 15.2 `StatusBadge.tsx` mapping each status to color-coded label
+  - [x] 15.2 `StatusBadge.tsx` mapping each status to color-coded label
     - _Requirements: 2.1, 3.1_
 
 - [ ] 16. Implement ticket list view
