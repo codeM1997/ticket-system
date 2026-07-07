@@ -11,17 +11,18 @@ const commentsRouter = Router({ mergeParams: true });
 // Requirements: 6.1, 6.2, 9.2
 commentsRouter.post("/", async (req, res, next) => {
   try {
+    // Validate payload first (cheap, no DB call) before checking existence.
+    const errors = validateCommentCreate(req.body ?? {});
+    if (errors.length > 0) {
+      throw new AppError(400, errors);
+    }
+
     const ticket = await prisma.ticket.findUnique({
       where: { id: req.params.id },
     });
 
     if (!ticket) {
       throw new AppError(404, [{ field: "id", message: "Ticket not found" }]);
-    }
-
-    const errors = validateCommentCreate(req.body ?? {});
-    if (errors.length > 0) {
-      throw new AppError(400, errors);
     }
 
     const { message, createdBy } = req.body;

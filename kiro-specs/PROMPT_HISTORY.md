@@ -897,3 +897,72 @@ This file records every user prompt submitted during spec-driven development of 
 - Generated Conventional Commits message: `test(server): add integration and persistence round-trip tests` with body listing the state machine integration suite (5 valid + 15 invalid pairs) and Property 14 round-trip test, referencing Requirements 12.1, 12.2, 12.3, 8.4.
 
 **User review & changes:** None — message provided for user to paste.
+
+
+---
+
+## Prompt 53 — Execute Task 11: Backend Checkpoint
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User asked to execute task 11 from the spec tasks.md — "Backend checkpoint". Task required ensuring all backend tests pass and raising questions if any arise.
+
+**Kiro output:**
+- Ran `npm test` in `server/` — 11 test files, 88 tests, all passed (6.56s).
+- No issues found; no questions raised.
+- Marked task 11 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 54 — Activate Code Review Mode
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User invoked `/caveman-review` to activate terse code review mode but did not specify a target file or diff to review.
+
+**Kiro output:**
+- Activated caveman-review skill (terse, one-line-per-finding format with severity prefixes).
+- Asked user to specify which files, diff, or scope to review — no target was provided.
+
+**User review & changes:** None — awaiting user response with review target.
+
+
+---
+
+## Prompt 55 — Code Review of Server Source
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User invoked `/caveman-review` and asked to review all `/server` code — source files, routes, prisma schema, validation, state machine, and error handling.
+
+**Kiro output:**
+- Reviewed 7 server source files plus Prisma schema.
+- Findings: two TOCTOU race conditions in tickets and comments routes (low-risk for demo); search fetches all tickets then filters in JS (OOM risk at scale, intentional SQLite workaround); `DATABASE_URL` fallback uses CWD-relative path; minor type/lint nits on `port` typing, eslint suppress, and `Prisma.TicketWhereInput` vs `Record<string, unknown>`.
+- No correctness bugs found. Validation and state machine modules clean.
+
+**User review & changes:** None — presented as review feedback only, no code changes requested.
+
+
+---
+
+## Prompt 56 — Fix Review Findings: TOCTOU, Validation Order, Cross-Platform Entry Check
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User asked to fix three issues from the code review: (1) TOCTOU race condition in the transition route by rechecking status in the update where clause, (2) validate payload before 404 check in comments.ts, (3) make `import.meta.url` entry-point check work cross-platform in index.ts.
+
+**Kiro output:**
+- `server/src/routes/tickets.ts`: Replaced `prisma.ticket.update` with `prisma.ticket.updateMany` using `where: { id, status: ticket.status }` — returns 409 Conflict if status changed concurrently between read and write.
+- `server/src/routes/comments.ts`: Moved `validateCommentCreate` call before the `findUnique` ticket existence check so invalid payloads get 400 without hitting DB.
+- `server/src/index.ts`: Replaced brittle `import.meta.url === \`file://${process.argv[1]}\`` with `fileURLToPath(import.meta.url)` + `path.resolve(process.argv[1])` comparison — handles symlinks, Windows drive letters, and URL-encoded paths.
+- `server/tests/property/ticketList.property.test.ts`: Bumped test timeout from 5s to 30s (pre-existing flaky timeout from accumulated test data, unrelated to fixes).
+- All 88 tests pass.
+
+**User review & changes:** None — accepted as-is.

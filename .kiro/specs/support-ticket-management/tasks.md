@@ -159,7 +159,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 14: Data persistence round trip** (create via API, reconnect Prisma client, re-query, assert equal)
     - **Validates: Requirements 8.4**
 
-- [ ] 11. Backend checkpoint
+- [x] 11. Backend checkpoint
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 12. Set up frontend project skeleton

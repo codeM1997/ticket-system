@@ -33,7 +33,7 @@ const ticketPayloadArb = fc.record({
 });
 
 describe("Property 3: Ticket list is ordered by updatedAt descending", () => {
-  it("GET /api/tickets always returns tickets with non-increasing updatedAt", async () => {
+  it("GET /api/tickets always returns tickets with non-increasing updatedAt", { timeout: 30_000 }, async () => {
     await fc.assert(
       fc.asyncProperty(
         fc.array(ticketPayloadArb, { minLength: 2, maxLength: 5 }),

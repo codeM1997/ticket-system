@@ -153,9 +153,25 @@ ticketsRouter.post("/:id/transitions", async (req, res, next) => {
       ]);
     }
 
-    const updated = await prisma.ticket.update({
-      where: { id: req.params.id },
+    // Use status in where clause to prevent TOCTOU race: if another request
+    // changed the status between our read and this write, updateMany returns
+    // count 0 and we reject with 409.
+    const result = await prisma.ticket.updateMany({
+      where: { id: req.params.id, status: ticket.status },
       data: { status: toStatus },
+    });
+
+    if (result.count === 0) {
+      throw new AppError(409, [
+        {
+          field: "toStatus",
+          message: `Conflict: ticket status changed concurrently`,
+        },
+      ]);
+    }
+
+    const updated = await prisma.ticket.findUnique({
+      where: { id: req.params.id },
     });
 
     res.json(updated);
