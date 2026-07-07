@@ -162,7 +162,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
 - [x] 11. Backend checkpoint
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Set up frontend project skeleton
+- [x] 12. Set up frontend project skeleton
   - Initialize `client/` with Vite + React + TypeScript template
   - Add deps: `@tanstack/react-query`, `react-router-dom`, vitest, `@testing-library/react`, fast-check
   - Configure Vite dev proxy `/api` → `http://localhost:<server-port>`

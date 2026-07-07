@@ -966,3 +966,72 @@ This file records every user prompt submitted during spec-driven development of 
 - All 88 tests pass.
 
 **User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 57 — Generate Commit Message for Review Fixes
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` to generate a commit message for the three review fixes (TOCTOU, validation order, cross-platform entry check) and the test timeout bump.
+
+**Kiro output:**
+- Generated Conventional Commits message: `fix(server): harden routes and cross-platform entry detection` with body listing TOCTOU fix (updateMany + 409), validation-before-404 reorder, fileURLToPath entry check, and test timeout bump.
+
+**User review & changes:** None — message provided for user to paste.
+
+
+---
+
+## Prompt 58 — Execute Task 12: Set Up Frontend Project Skeleton
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User asked to execute task 12 from the spec tasks.md — "Set up frontend project skeleton". Task required initializing `client/` with Vite + React + TypeScript, adding deps (`@tanstack/react-query`, `react-router-dom`, vitest, `@testing-library/react`, fast-check), configuring Vite dev proxy `/api` to `http://localhost:3001`, and creating `client/src/main.tsx` wiring `QueryClientProvider` and `BrowserRouter`. User also required `engines.node: "20.19.0"` matching server.
+
+**Kiro output:**
+- Rewrote `client/package.json` with all required deps, scripts (`dev`/`build`/`preview`/`test`), and `engines.node: "20.19.0"`.
+- Created `client/tsconfig.json` (strict, ESNext, react-jsx).
+- Created `client/index.html` with root mount div.
+- Created `client/vite.config.ts` with `@vitejs/plugin-react`, proxy `/api` to `http://localhost:3001`, and vitest jsdom config.
+- Created `client/.nvmrc` pinning `20.19.0`.
+- Created `client/src/main.tsx` wiring `QueryClientProvider`, `BrowserRouter`, and `StrictMode`.
+- Created `client/src/App.tsx` placeholder component.
+- Ran `npm install` under Node v20.19.0 (user corrected initial install that ran under v22.11.0).
+- TypeScript compiles clean (`tsc --noEmit` passes).
+- Marked task 12 as completed in `tasks.md`.
+
+**User review & changes:** User caught that initial `npm install` ran under wrong Node version (v22.11.0); asked to switch via `nvm use v20.19.0` before reinstalling. Applied.
+
+
+---
+
+## Prompt 59 — Explain Vite Proxy Config
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User asked for a brief explanation (under 50 words) of the Vite `server.proxy` configuration that forwards `/api` requests to `http://localhost:3001`.
+
+**Kiro output:**
+- Explained that Vite dev server intercepts `/api` requests from the browser and proxies them to the Express backend on port 3001, avoiding CORS issues during development by making requests appear same-origin.
+
+**User review & changes:** None.
+
+
+---
+
+## Prompt 60 — Commit Message for Frontend Skeleton
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` to generate a commit message for the task 12 frontend skeleton changes (Vite + React + TypeScript setup, deps, proxy config, main.tsx wiring).
+
+**Kiro output:**
+- Generated Conventional Commits message: `feat(client): scaffold Vite + React + TypeScript frontend` with body noting QueryClientProvider/BrowserRouter wiring, Vite proxy, and Node 20.19.0 constraint.
+
+**User review & changes:** None — message provided for user to paste.
