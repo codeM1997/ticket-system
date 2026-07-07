@@ -148,14 +148,14 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 11: Invalid comment creation yields 400**
     - **Validates: Requirements 6.2, 9.2**
 
-- [ ] 10. Integration tests for state machine over HTTP
-  - [ ] 10.1 Write supertest suite in `server/tests/integration/stateMachine.integration.test.ts`
+- [x] 10. Integration tests for state machine over HTTP
+  - [x] 10.1 Write supertest suite in `server/tests/integration/stateMachine.integration.test.ts`
     - For each valid pair {(Open, In Progress), (Open, Cancelled), (In Progress, Resolved), (In Progress, Cancelled), (Resolved, Closed)}: create ticket via API, drive to `fromStatus`, POST transition, assert 200 and re-fetch ticket to assert persisted status
     - For representative invalid pairs (Open→Resolved, Closed→Open, Cancelled→Open, Resolved→In Progress): create ticket, drive to `fromStatus`, POST transition, assert 400
     - Each test creates its own ticket; no shared state
     - _Requirements: 12.1, 12.2, 12.3_
 
-  - [ ] 10.2 Write property test for data persistence round trip
+  - [x] 10.2 Write property test for data persistence round trip
     - **Property 14: Data persistence round trip** (create via API, reconnect Prisma client, re-query, assert equal)
     - **Validates: Requirements 8.4**
 

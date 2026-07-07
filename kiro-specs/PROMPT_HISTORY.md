@@ -832,3 +832,68 @@ This file records every user prompt submitted during spec-driven development of 
 - `getDiagnostics` on both files: clean. `npm test` in `server/`: 9 files, 66/66 tests passed.
 
 **User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 49 — Commit Task 9 and Review Fixes
+
+**Date:** 2026-07-04
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` asking to commit the current changes — task 9's comment route, its property tests, and the two review fixes (P2003 mapping, createdBy validation).
+
+**Kiro output:**
+- Staged `tasks.md`, `kiro-specs/PROMPT_HISTORY.md`, `server/src/errors.ts`, `server/src/routes/tickets.ts`, `server/src/routes/comments.ts`, `server/tests/property/comment.property.test.ts`.
+- Committed as `afd6335` with subject `feat(server): comment route, P2003 mapping, createdBy check` and a body summarising the comment endpoint, the two property tests (Properties 10, 11), and the P2003-to-400 error-middleware mapping closing the TOCTOU gap alongside the existing P2025-to-404 mapping.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 50 — Execute Task 10: Integration Tests for State Machine over HTTP
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User asked to execute task 10 from the spec tasks.md — "Integration tests for state machine over HTTP". Sub-task 10.1 required a supertest suite with tests for all 5 valid transitions (create ticket, drive to fromStatus, POST transition, assert 200, re-fetch to verify persistence) and 4 representative invalid transitions (assert 400 + error message), each test using its own ticket. Sub-task 10.2 required Property 14 (data persistence round trip — create via API, reconnect fresh Prisma client, re-query, assert equal).
+
+**Kiro output:**
+- Created `server/tests/integration/stateMachine.integration.test.ts` — 9 tests: 5 valid pairs (Open to In Progress, Open to Cancelled, In Progress to Resolved, In Progress to Cancelled, Resolved to Closed) and 4 invalid pairs (Open to Resolved, Closed to Open, Cancelled to Open, Resolved to In Progress). Helper `driveToStatus` transitions ticket through intermediate states to reach each `fromStatus`. Each test creates its own ticket, posts transition, asserts 200/400, re-fetches to verify persistence.
+- Created `server/tests/property/persistence.roundTrip.property.test.ts` — Property 14 with two fast-check properties at 20 runs each: (1) ticket created via API retrieved from fresh `PrismaClient` with same field values; (2) comment created via API retrieved from fresh `PrismaClient` with same field values.
+- All 11 tests pass (9 integration + 2 property).
+- Marked sub-tasks 10.1, 10.2 and parent task 10 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 51 — Expand Invalid State Machine Transition Test Coverage
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User noted the invalid state machine transition pairs in the integration test were missing many invalid transition options — only 4 pairs were covered.
+
+**Kiro output:**
+- Expanded invalid pairs in `server/tests/integration/stateMachine.integration.test.ts` from 4 to 15, covering all invalid transitions across every status: Open (skip Resolved, Closed), In Progress (backwards Open, skip Closed), Resolved (backwards Open, In Progress, lateral Cancelled), Closed terminal (all 4 targets), Cancelled terminal (all 4 targets).
+- Test suite now 20 tests (5 valid + 15 invalid), all passing.
+
+**User review & changes:** User-initiated — spotted the gap and requested the fix.
+
+
+---
+
+## Prompt 52 — Commit Message for Task 10
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` to generate a commit message for the task 10 changes (integration tests and persistence round-trip property test).
+
+**Kiro output:**
+- Generated Conventional Commits message: `test(server): add integration and persistence round-trip tests` with body listing the state machine integration suite (5 valid + 15 invalid pairs) and Property 14 round-trip test, referencing Requirements 12.1, 12.2, 12.3, 8.4.
+
+**User review & changes:** None — message provided for user to paste.
