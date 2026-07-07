@@ -1035,3 +1035,90 @@ This file records every user prompt submitted during spec-driven development of 
 - Generated Conventional Commits message: `feat(client): scaffold Vite + React + TypeScript frontend` with body noting QueryClientProvider/BrowserRouter wiring, Vite proxy, and Node 20.19.0 constraint.
 
 **User review & changes:** None — message provided for user to paste.
+
+
+---
+
+## Prompt 61 — Commit Frontend Skeleton
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User asked to git commit using the commit message generated in Prompt 60.
+
+**Kiro output:**
+- Staged all task 12 files (client/.nvmrc, index.html, src/, tsconfig.json, vite.config.ts, package.json, package-lock.json, tasks.md, PROMPT_HISTORY.md).
+- Committed as `88e9c89` with message `feat(client): scaffold Vite + React + TypeScript frontend`.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 62 — Execute Task 13: Define Shared Frontend Types and API Client
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User asked to execute task 13 from the spec tasks.md — "Define shared frontend types and API client". Task required creating TypeScript types matching backend models, fetch wrappers for all endpoints, and centralized error parsing with typed errors carrying HTTP status and parsed body.
+
+**Kiro output:**
+- Created `client/src/types/index.ts` with `Ticket`, `Comment`, `User`, `Priority`, `Status` types, request/response payload interfaces (`CreateTicketPayload`, `UpdateTicketPayload`, `TransitionPayload`, `CreateCommentPayload`, `TicketListResponse`, `UserListResponse`), and error shapes (`ValidationError`, `ApiErrorBody`) matching backend contract.
+- Created `client/src/api/tickets.ts` with `ApiError` class (carries `status` + `body`), generic `request<T>` helper handling JSON content-type, network errors (status 0 with connectivity message), and non-ok response parsing. Exported wrappers: `listTickets`, `getTicket`, `createTicket`, `updateTicket`, `transitionTicket`, `addComment`, `listUsers`.
+- Both files pass `getDiagnostics` clean.
+- Marked task 13 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 63 — Code Review: Client Folder
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User invoked `/caveman-review` to review all files in the `client/` folder (types, API client, App, main, vite config, tsconfig, package.json).
+
+**Kiro output:**
+- 7 findings across 2 files:
+  - `api/tickets.ts` L36: 🟡 `Content-Type: application/json` sent on GET (causes unnecessary CORS preflight). Fix: only set when body exists.
+  - `api/tickets.ts` L59: 🟡 empty-string status silently dropped — document contract or accept `undefined` only.
+  - `api/tickets.ts` L63: 🔵 path-segment `id` not URL-encoded.
+  - `api/tickets.ts` L30: 🔵 missing `Object.setPrototypeOf` prototype fixup for `ApiError` extending `Error`.
+  - `vite.config.ts` L9: ❓ proxy target `localhost:3001` vs server `.env` `PORT=3006` mismatch.
+  - `package.json` L27: 🔵 `vitest: "^4.1.0"` — version 4.x may not exist; verify lockfile.
+- `types/index.ts` and `main.tsx` marked clean.
+
+**User review & changes:** None — review findings presented only, no code changes requested yet.
+
+
+---
+
+## Prompt 64 — Fix Review Findings: Content-Type on GET and Proxy Port Mismatch
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User asked to fix review finding #1 (Content-Type header sent on GET requests) and #5 (Vite proxy target port mismatch with server .env).
+
+**Kiro output:**
+- `client/src/api/tickets.ts`: Changed `request()` to only set `Content-Type: application/json` when `init?.body` exists, avoiding unnecessary CORS preflight on GET requests.
+- `client/vite.config.ts`: Changed proxy target from `http://localhost:3001` to `http://localhost:3006` matching server `.env` PORT setting.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 65 — Commit Message for Task 13 + Review Fixes
+
+**Date:** 2026-07-07
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` to generate a commit message covering task 13 (frontend types and API client) plus the two review fixes (Content-Type on GET, proxy port mismatch).
+
+**Kiro output:**
+- Generated Conventional Commits message: `feat(client): add frontend types, API client, and fix proxy port` with body listing shared TS types, fetch wrappers with ApiError, Content-Type conditional, and proxy port correction.
+
+**User review & changes:** None — message provided for user to paste.

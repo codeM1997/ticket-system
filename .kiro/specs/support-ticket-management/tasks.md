@@ -169,7 +169,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Create `client/src/main.tsx` wiring `QueryClientProvider` and `BrowserRouter`
   - _Requirements: 11.1_
 
-- [ ] 13. Define shared frontend types and API client
+- [x] 13. Define shared frontend types and API client
   - Create `client/src/types/index.ts` with `Ticket`, `Comment`, `User`, `Priority`, `Status`, request/response payload types matching backend
   - Create `client/src/api/tickets.ts` with fetch wrappers for every endpoint (list, get, create, update, transition, addComment, listUsers)
   - Centralize error parsing: throw typed error containing HTTP status and parsed body

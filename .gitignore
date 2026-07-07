@@ -9,3 +9,4 @@ coverage/
 
 # Prisma generated client
 server/src/generated/
+.vscode/settings.json
