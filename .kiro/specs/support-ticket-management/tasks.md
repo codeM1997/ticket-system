@@ -194,7 +194,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Wire `SearchFilter.tsx` (keyword input + status dropdown) driving the list query
   - _Requirements: 2.1, 2.3, 7.4_
 
-- [ ] 17. Implement ticket create/edit form
+- [x] 17. Implement ticket create/edit form
   - Create `TicketForm.tsx` used in both create and edit modes
   - Client-side validation: title/description non-empty, priority in enum, createdBy selected (from users dropdown)
   - Block submission and disable submit button while any validation error present

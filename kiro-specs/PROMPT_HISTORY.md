@@ -1277,3 +1277,71 @@ This file records every user prompt submitted during spec-driven development of 
 - Generated Conventional Commits message: `feat(client): ticket list view with search, filter, assignee resolve` with body listing TicketList table, SearchFilter, 300ms debounce, userId-to-name resolution, and empty/no-results states.
 
 **User review & changes:** None — message presented for user to paste.
+
+
+---
+
+## Prompt 75 — Run Client and Server on Correct Node Version
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User asked to run both client and server dev processes using the correct Node version via `nvm use v<version>` format.
+
+**Kiro output:**
+- Confirmed both projects use Node v20.19.0 (from `.nvmrc` files).
+- Started server (`tsx watch src/index.ts`) on port 3006 with `nvm use v20.19.0`.
+- Started client (`vite`) on http://localhost:5173/ with `nvm use v20.19.0`.
+- Both processes running successfully.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 76 — Implement Ticket Create/Edit Form
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> Execute task 17 from the support-ticket-management spec: create a TicketForm component supporting both create and edit modes with client-side validation, field-level errors, disabled submit while invalid, backend error surfacing, and navigation on success.
+
+**Kiro output:**
+- Created `client/src/components/TicketForm.tsx` with dual create/edit mode, client-side validation (title, description, priority, createdBy), field-level error display, submit disabled while errors present, backend 4xx error mapping to fields, and navigate to ticket on success
+- Updated `client/src/App.tsx` to add routing with `Routes`/`Route` from react-router-dom, nav links, and `/tickets/new` route rendering TicketForm in create mode
+- Verified TypeScript compiles clean
+
+**User review & changes:** None
+
+---
+
+## Prompt 77 — Fix Frontend 500 Error on /api/tickets
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User reported frontend cannot hit backend — `GET http://localhost:5173/api/tickets` returns 500 Internal Server Error.
+
+**Kiro output:**
+- Verified Vite proxy config forwards `/api` to `http://localhost:3006` (correct, matches server PORT env)
+- Confirmed server running via `tsx watch` and returning 500 (not a proxy issue)
+- Diagnosed root cause: `better-sqlite3` native addon was compiled for Node 22 (NODE_MODULE_VERSION 127) but runtime is Node 20 (NODE_MODULE_VERSION 115)
+- Ran `npm rebuild better-sqlite3` in server dir to recompile native binary for current Node version
+- Touched `server/src/index.ts` to trigger `tsx watch` restart
+- Verified `/api/tickets` now returns ticket data successfully
+
+**User review & changes:** None
+
+
+---
+
+## Prompt 77 — Commit Message for TicketForm
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User requested a commit message in Conventional Commits format for the TicketForm implementation and App.tsx routing changes.
+
+**Kiro output:**
+- Generated commit message: `feat(client): add TicketForm with client-side validation` with body explaining dual mode, validation blocking, backend error mapping, and routing
+
+**User review & changes:** None
