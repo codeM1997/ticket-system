@@ -1193,3 +1193,87 @@ This file records every user prompt submitted during spec-driven development of 
 - Marked sub-tasks 15.1, 15.2, and parent task 15 as completed in `tasks.md`.
 
 **User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 70 — Commit Task 15 UI Components
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` asking to commit the current changes — task 15's `ErrorMessage.tsx` and `StatusBadge.tsx` shared UI components.
+
+**Kiro output:**
+- Staged `tasks.md`, `kiro-specs/PROMPT_HISTORY.md`, and the new `client/src/components/` directory (`ErrorMessage.tsx`, `StatusBadge.tsx`).
+- Committed as `89a579d` with subject `feat(client): shared UI components ErrorMessage, StatusBadge` and a body noting `role="alert"` + WCAG AA contrast for `ErrorMessage`, color-coded pill styling for `StatusBadge`, and sub-tasks 15.1/15.2 completion.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 71 — Execute Task 16: Implement Ticket List View
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User asked to execute task 16 from the spec tasks.md — "Implement ticket list view". Task required creating `TicketList.tsx` rendering title, priority, status, and assignee for every ticket; showing an empty-state message when the list is empty; showing a "no results" message when filters are applied but return nothing; and wiring `SearchFilter.tsx` (keyword input + status dropdown) to drive the list query.
+
+**Kiro output:**
+- Created `client/src/components/SearchFilter.tsx` with a text input (`aria-label="Search tickets"`) and a status dropdown (`aria-label="Filter by status"`) listing all 5 statuses plus an "All Statuses" option; lifts state to parent via `onSearchChange`/`onStatusChange` callbacks.
+- Created `client/src/components/TicketList.tsx` using `useTicketList(filters)` hook; renders a table with Title/Priority/Status/Assignee columns; conditionally shows "No tickets yet" empty state (no filters) vs "No tickets match your search criteria" (filters active); delegates status rendering to `StatusBadge`; shows loading state; surfaces errors via `ErrorMessage`.
+- Wired `TicketList` into `App.tsx` as the main view.
+- `getDiagnostics` clean on all three files.
+- Marked task 16 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 72 — Code Review: Task 16 Ticket List View
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User invoked `/caveman-review` asking to review the changed files from task 16 — `TicketList.tsx`, `SearchFilter.tsx`, and `App.tsx`.
+
+**Kiro output:**
+- Reviewed all three files in terse caveman-review format.
+- Findings on `TicketList.tsx`: 🟡 no debounce on search input (floods backend on fast typing); 🟡 `assignedTo` renders raw userId instead of display name; 🔵 filters object rebuilt every render unnecessarily; 🔵 early-return on error hides SearchFilter so user can't clear filters to recover.
+- Finding on `SearchFilter.tsx`: 🔵 `status` prop typed as broad `string` instead of `Status | ""`.
+- `App.tsx`: clean, no findings.
+
+**User review & changes:** None yet — review findings presented only, awaiting user decision on whether to apply fixes.
+
+
+---
+
+## Prompt 73 — Fix Review Points 1 & 2: Debounce Search and Resolve Assignee Name
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User asked to fix review points 1 (no debounce on search input flooding backend) and 2 (assignedTo rendering raw userId instead of display name) from the Prompt 72 code review.
+
+**Kiro output:**
+- Added `useDebounce` hook (300ms delay) in `TicketList.tsx`; search query now uses debounced value before passing to `useTicketList`.
+- Added `useUsers()` call and built a `Map<userId, name>` to resolve `assignedTo` to human-readable name; renders "Unassigned" when null, "Unknown" when userId not in users list.
+- `getDiagnostics` clean.
+
+**User review & changes:** None — accepted as-is.
+
+
+---
+
+## Prompt 74 — Commit Message for Task 16 Ticket List View
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` asking to generate a commit message for the current staged changes (task 16 ticket list view + review fixes).
+
+**Kiro output:**
+- Generated Conventional Commits message: `feat(client): ticket list view with search, filter, assignee resolve` with body listing TicketList table, SearchFilter, 300ms debounce, userId-to-name resolution, and empty/no-results states.
+
+**User review & changes:** None — message presented for user to paste.
