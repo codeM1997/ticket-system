@@ -207,7 +207,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 17: Frontend blocks API calls when client-side validation fails** (ticket create/update portion)
     - **Validates: Requirements 13.1, 13.2, 13.4**
 
-- [ ] 18. Implement ticket detail view
+- [x] 18. Implement ticket detail view
   - Create `TicketDetail.tsx` displaying title, description, priority, status, assignee, creator, timestamps
   - Render `CommentList.tsx` in chronological order (oldest first)
   - Render `TransitionButtons.tsx` showing only `getValidTransitions(currentStatus)` options

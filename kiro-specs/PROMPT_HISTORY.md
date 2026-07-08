@@ -1345,3 +1345,36 @@ This file records every user prompt submitted during spec-driven development of 
 - Generated commit message: `feat(client): add TicketForm with client-side validation` with body explaining dual mode, validation blocking, backend error mapping, and routing
 
 **User review & changes:** None
+
+---
+
+## Prompt 78 — Implement Ticket Detail View
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> Execute task 18 from the support-ticket-management spec: create TicketDetail.tsx displaying full ticket info, CommentList in chronological order, TransitionButtons showing only valid next-status options, surface transition rejection via ErrorMessage, and show "ticket not found" on 404.
+
+**Kiro output:**
+- Created `client/src/components/TransitionButtons.tsx` with client-side `VALID_TRANSITIONS` map mirroring server state machine, rendering only valid next-status buttons for current status
+- Created `client/src/components/CommentList.tsx` rendering comments oldest-first with timestamp and author
+- Created `client/src/components/TicketDetail.tsx` with full ticket display (title, description, priority, status, assignee, creator, timestamps), transition error surfacing via ErrorMessage, 404 handling
+- Updated `client/src/App.tsx` to add `/tickets/:id` route rendering TicketDetail
+- Updated `client/src/components/TicketList.tsx` to link ticket titles to detail view via react-router-dom Link
+- TypeScript compiles clean, no diagnostics
+
+**User review & changes:** None
+
+---
+
+## Prompt 79 — Commit Message for Ticket Detail View
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` requesting a Conventional Commits message for the ticket detail view implementation (task 18).
+
+**Kiro output:**
+- Generated commit message: `feat(client): add ticket detail view with transitions` with body noting TicketList linking, client-side state machine mirror for TransitionButtons, and Req 5.8 traceability
+
+**User review & changes:** None

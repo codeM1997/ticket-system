@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useTicketList, useUsers } from "../hooks/useTickets";
 import { StatusBadge } from "./StatusBadge";
 import { SearchFilter } from "./SearchFilter";
@@ -73,7 +74,9 @@ export function TicketList() {
           <tbody>
             {tickets.map((ticket) => (
               <tr key={ticket.id} style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "0.5rem" }}>{ticket.title}</td>
+                <td style={{ padding: "0.5rem" }}>
+                  <Link to={`/tickets/${ticket.id}`}>{ticket.title}</Link>
+                </td>
                 <td style={{ padding: "0.5rem" }}>{ticket.priority}</td>
                 <td style={{ padding: "0.5rem" }}>
                   <StatusBadge status={ticket.status} />
