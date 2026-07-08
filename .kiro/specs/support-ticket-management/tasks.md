@@ -230,7 +230,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 17: Frontend blocks API calls when client-side validation fails** (comment portion)
     - **Validates: Requirements 13.3, 13.4**
 
-- [ ] 20. Wire application routes and shell
+- [x] 20. Wire application routes and shell
   - In `App.tsx`, define routes: `/` (list), `/tickets/new` (create), `/tickets/:id` (detail with edit + comments)
   - Global error boundary rendering `ErrorMessage` for network failures ("Unable to connect to server. Check your connection.") and 5xx ("Something went wrong. Please try again later.")
   - _Requirements: 10.1, 10.3_

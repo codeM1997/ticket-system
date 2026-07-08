@@ -1474,3 +1474,67 @@ This file records every user prompt submitted during spec-driven development of 
 - Updated `CreateTicketPayload` type with optional `assignedTo`
 
 **User review & changes:** None
+
+---
+
+## Prompt 86 — Generate Commit Message for Recent Changes
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` to generate a Conventional Commits message for the recent changes (comment form, edit route, assignee dropdown, user name resolution).
+
+**Kiro output:**
+- Generated commit message: `feat: add comment form, edit route, and assignee on create` with body listing CommentForm, edit route, assignedTo dropdown in both modes, and backend acceptance of optional assignedTo
+
+**User review & changes:** None
+
+---
+
+## Prompt 87 — Execute Task 20: Wire Application Routes and Shell
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User asked to execute task 20 from the spec tasks.md — "Wire application routes and shell". Task required defining routes in `App.tsx` (`/`, `/tickets/new`, `/tickets/:id`) and adding a global error boundary rendering `ErrorMessage` for network failures and 5xx errors.
+
+**Kiro output:**
+- Routes already existed (`/`, `/tickets/new`, `/tickets/:id`, `/tickets/:id/edit`); kept as-is.
+- Added class-based `ErrorBoundary` component wrapping entire app shell — detects network errors ("Unable to connect to server. Check your connection.") and 5xx/unexpected errors ("Something went wrong. Please try again later.") using `getDerivedStateFromError`.
+- Boundary renders `ErrorMessage` (role="alert", WCAG AA) with a "Try again" reset button.
+- TypeScript compilation clean, no diagnostics.
+- Marked task 20 as completed in `tasks.md`.
+
+**User review & changes:** None
+
+---
+
+## Prompt 88 — Code Review of Task 20 (App.tsx Error Boundary)
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User invoked `/caveman-review` to review the `App.tsx` changes from task 20 — the error boundary and route wiring.
+
+**Kiro output:**
+- 4 findings:
+  - 🟡 risk: Network detection relies on `error.message` containing "network" — Chrome/Safari throw different strings. Should check `instanceof TypeError` instead.
+  - 🟡 risk: React Query default does not throw on error, so async fetch errors never reach ErrorBoundary unless `throwOnError: true` is configured on QueryClient or per-query.
+  - 🔵 nit: `handleReset` clears state but doesn't reset React Query cache — stale errored queries won't retry. Wrap with `QueryErrorResetBoundary`.
+  - 🔵 nit: "Try again" button lacks accessible label context for screen readers.
+
+**User review & changes:** Pending — findings presented for user decision.
+
+---
+
+## Prompt 89 — Generate Commit Message for Task 20 Changes
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User invoked `/caveman-commit` to generate a Conventional Commits message for the current unstaged diff (ErrorBoundary in App.tsx, task 20 marked complete, prompt history update).
+
+**Kiro output:**
+- Generated commit message: `feat(client): add global error boundary to App shell` with body noting ErrorBoundary catches network/5xx errors, renders ErrorMessage with reset button, and routes wrapped in boundary.
+
+**User review & changes:** None
