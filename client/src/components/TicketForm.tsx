@@ -67,7 +67,7 @@ export function TicketForm({ mode, ticket }: TicketFormProps) {
 
     if (mode === "create") {
       createMutation.mutate(
-        { title: title.trim(), description: description.trim(), priority: priority as Priority, createdBy },
+        { title: title.trim(), description: description.trim(), priority: priority as Priority, createdBy, assignedTo: assignedTo || null },
         {
           onSuccess: (created) => navigate(`/tickets/${created.id}`),
           onError: (err) => handleApiError(err),
@@ -182,21 +182,19 @@ export function TicketForm({ mode, ticket }: TicketFormProps) {
         </div>
       )}
 
-      {mode === "edit" && (
-        <div style={fieldStyle}>
-          <label htmlFor="assignedTo">Assigned To</label>
-          <select
-            id="assignedTo"
-            value={assignedTo}
-            onChange={(e) => setAssignedTo(e.target.value)}
-          >
-            <option value="">Unassigned</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>{u.name}</option>
-            ))}
-          </select>
-        </div>
-      )}
+      <div style={fieldStyle}>
+        <label htmlFor="assignedTo">Assigned To</label>
+        <select
+          id="assignedTo"
+          value={assignedTo}
+          onChange={(e) => setAssignedTo(e.target.value)}
+        >
+          <option value="">Unassigned</option>
+          {users.map((u) => (
+            <option key={u.id} value={u.id}>{u.name}</option>
+          ))}
+        </select>
+      </div>
 
       <button type="submit" disabled={hasErrors || isPending}>
         {isPending ? "Saving..." : mode === "create" ? "Create Ticket" : "Save Changes"}

@@ -41,6 +41,7 @@ export interface CreateTicketPayload {
   description: string;
   priority: Priority;
   createdBy: string;
+  assignedTo?: string | null;
 }
 
 export interface UpdateTicketPayload {

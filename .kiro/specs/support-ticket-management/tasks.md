@@ -219,7 +219,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
     - **Property 9: Frontend presents only valid next-status options** (client-side portion — rendered buttons match expected set for every status)
     - **Validates: Requirements 5.8**
 
-- [ ] 19. Implement comment form
+- [x] 19. Implement comment form
   - Create `CommentForm.tsx` with message textarea and createdBy user select
   - Client-side validation: message non-empty after trim, createdBy present
   - Disable submit while invalid; block API call and display error

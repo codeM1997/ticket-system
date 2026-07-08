@@ -1,7 +1,16 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useParams } from "react-router-dom";
 import { TicketList } from "./components/TicketList";
 import { TicketForm } from "./components/TicketForm";
 import { TicketDetail } from "./components/TicketDetail";
+import { useTicket } from "./hooks/useTickets";
+
+function EditTicketRoute() {
+  const { id } = useParams<{ id: string }>();
+  const { data: ticket, isLoading } = useTicket(id ?? "");
+  if (isLoading) return <p>Loading...</p>;
+  if (!ticket) return <p>Ticket not found</p>;
+  return <TicketForm mode="edit" ticket={ticket} />;
+}
 
 function App() {
   return (
@@ -15,6 +24,7 @@ function App() {
         <Route path="/" element={<TicketList />} />
         <Route path="/tickets/new" element={<TicketForm mode="create" />} />
         <Route path="/tickets/:id" element={<TicketDetail />} />
+        <Route path="/tickets/:id/edit" element={<EditTicketRoute />} />
       </Routes>
     </div>
   );

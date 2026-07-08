@@ -22,7 +22,7 @@ ticketsRouter.post("/", async (req, res, next) => {
       throw new AppError(400, errors);
     }
 
-    const { title, description, priority, createdBy } = req.body;
+    const { title, description, priority, createdBy, assignedTo } = req.body;
 
     const ticket = await prisma.ticket.create({
       data: {
@@ -30,6 +30,7 @@ ticketsRouter.post("/", async (req, res, next) => {
         description,
         priority,
         createdBy,
+        assignedTo: assignedTo || null,
         status: "Open",
       },
     });

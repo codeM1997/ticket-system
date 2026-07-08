@@ -1378,3 +1378,99 @@ This file records every user prompt submitted during spec-driven development of 
 - Generated commit message: `feat(client): add ticket detail view with transitions` with body noting TicketList linking, client-side state machine mirror for TransitionButtons, and Req 5.8 traceability
 
 **User review & changes:** None
+
+---
+
+## Prompt 80 — Execute Task 19: Implement Comment Form
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> Execute task 19 from the support-ticket-management spec: create CommentForm.tsx with message textarea and createdBy user select, client-side validation (non-empty message after trim, createdBy present), disable submit while invalid, block API call on validation failure, and show new comment without page reload on success.
+
+**Kiro output:**
+- Created `client/src/components/CommentForm.tsx` with textarea, user select dropdown, live validation, disabled submit button while errors present, API error surfacing via ErrorMessage, and form reset on success
+- Wired CommentForm into TicketDetail.tsx below the CommentList
+- TypeScript compiles clean, no diagnostics
+
+**User review & changes:** None
+
+---
+
+## Prompt 81 — Fix Comment Author Displaying UUID Instead of Name
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User reported that comments display the raw user UUID (e.g. `601b5bd7-d5fd-402c-9d3c-92d582072675`) instead of the user's name. Asked to fix.
+
+**Kiro output:**
+- Updated `client/src/components/CommentList.tsx` to accept an optional `users` prop and resolve `comment.createdBy` UUID to user name via lookup, falling back to raw ID if not found
+- Updated `client/src/components/TicketDetail.tsx` to pass the `users` array to `CommentList`
+
+**User review & changes:** None
+
+---
+
+## Prompt 82 — Code Review of Comment Form and List Changes
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User invoked `/caveman-review` to review recent changes across CommentForm.tsx, CommentList.tsx, and TicketDetail.tsx.
+
+**Kiro output:**
+- Reviewed all three files; no bugs found
+- Flagged risks: `validate()` called every render (perf on keystroke), `.find()` O(n) per comment, `onSuccess` resets message but not `createdBy`
+- Nits: unused `User` import in CommentForm, duplicate `useUsers()` subscription (deduped by React Query)
+
+**User review & changes:** None
+
+---
+
+## Prompt 83 — Fix CommentForm Review Issues 1 and 3
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User asked to fix review issue 1 (validate() called every render) and issue 3 (onSuccess resets message but not createdBy) from the Prompt 82 code review.
+
+**Kiro output:**
+- Wrapped `validate()` result in `useMemo` with `[message, createdBy]` deps to avoid recomputation on unrelated renders
+- Added `setCreatedBy("")` to `onSuccess` callback so both fields reset after successful comment submission
+
+**User review & changes:** None
+
+---
+
+## Prompt 84 — Clarify assignedTo Validation on Ticket Creation
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User asked why users cannot assign a ticket to another user at creation time, and whether validation is missing on backend and frontend for this field.
+
+**Kiro output:**
+- Investigated backend `validateTicketCreate` and frontend `TicketForm` — confirmed `assignedTo` is intentionally optional/nullable per design (not a required field)
+- Explained that backend correctly omits `assignedTo` from required fields (Requirement 1.2), and frontend only shows the assignee dropdown in edit mode
+- Offered to add an optional "Assigned To" dropdown to create mode as a UX improvement (no validation change needed)
+
+**User review & changes:** Pending user decision on whether to add optional assignee field to create mode
+
+---
+
+## Prompt 85 — Add Edit Route and Assignee Dropdown to Create Mode
+
+**Date:** 2026-07-08
+
+**Prompt (summarised):**
+> User reported they cannot see the "Assigned To" dropdown in edit mode either. Investigation revealed no `/tickets/:id/edit` route existed, so edit mode was never reachable.
+
+**Kiro output:**
+- Added `/tickets/:id/edit` route in `App.tsx` with `EditTicketRoute` wrapper that fetches ticket before rendering TicketForm in edit mode
+- Added "Edit" link in `TicketDetail.tsx` next to "Back to list"
+- Moved "Assigned To" dropdown to show in both create and edit modes (optional, no validation required)
+- Updated backend `POST /api/tickets` route to accept and persist optional `assignedTo` field
+- Updated `CreateTicketPayload` type with optional `assignedTo`
+
+**User review & changes:** None

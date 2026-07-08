@@ -1,13 +1,14 @@
 // CommentList: displays comments in chronological order (oldest first)
 // Requirements: 6.4
 
-import type { Comment } from "../types";
+import type { Comment, User } from "../types";
 
 export interface CommentListProps {
   comments: Comment[];
+  users?: User[];
 }
 
-export function CommentList({ comments }: CommentListProps) {
+export function CommentList({ comments, users = [] }: CommentListProps) {
   if (comments.length === 0) {
     return <p style={{ color: "#666", fontStyle: "italic" }}>No comments yet.</p>;
   }
@@ -27,7 +28,7 @@ export function CommentList({ comments }: CommentListProps) {
         >
           <p style={{ margin: "0 0 0.25rem" }}>{comment.message}</p>
           <small style={{ color: "#666" }}>
-            By {comment.createdBy} &middot;{" "}
+            By {users.find((u) => u.id === comment.createdBy)?.name ?? comment.createdBy} &middot;{" "}
             {new Date(comment.createdAt).toLocaleString()}
           </small>
         </li>

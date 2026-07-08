@@ -10,6 +10,7 @@ import { StatusBadge } from "./StatusBadge";
 import { ErrorMessage } from "./ErrorMessage";
 import { TransitionButtons } from "./TransitionButtons";
 import { CommentList } from "./CommentList";
+import { CommentForm } from "./CommentForm";
 
 export function TicketDetail() {
   const { id } = useParams<{ id: string }>();
@@ -56,6 +57,8 @@ export function TicketDetail() {
   return (
     <div>
       <Link to="/">&larr; Back to list</Link>
+      {" | "}
+      <Link to={`/tickets/${ticket.id}/edit`}>Edit</Link>
 
       <h2 style={{ marginTop: "1rem" }}>{ticket.title}</h2>
 
@@ -88,7 +91,8 @@ export function TicketDetail() {
       />
 
       <h3 style={{ marginTop: "1.5rem" }}>Comments</h3>
-      <CommentList comments={ticket.comments ?? []} />
+      <CommentList comments={ticket.comments ?? []} users={users} />
+      <CommentForm ticketId={ticket.id} />
     </div>
   );
 }
