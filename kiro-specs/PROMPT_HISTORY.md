@@ -1538,3 +1538,23 @@ This file records every user prompt submitted during spec-driven development of 
 - Generated commit message: `feat(client): add global error boundary to App shell` with body noting ErrorBoundary catches network/5xx errors, renders ErrorMessage with reset button, and routes wrapped in boundary.
 
 **User review & changes:** None
+
+
+---
+
+## Prompt — Execute Task 21: Project Documentation and Hygiene
+
+**Date:** 2026-07-09
+
+**Prompt (summarised):**
+> User asked to execute task 21 from the spec tasks.md — "Project documentation and hygiene". Sub-tasks: 21.1 update `.gitignore`, 21.2 create `.env.example` files, 21.3 rewrite `README.md` with full setup instructions, 21.4 append prompt history entry.
+
+**Kiro output:**
+- Updated root `.gitignore` adding `.env.local` and `*.db-journal` (previously missing per spec).
+- Created `server/.env.example` documenting `PORT` and `DATABASE_URL`.
+- Created root `.env.example` documenting server and client env vars (`VITE_API_URL` commented out since Vite proxy handles it).
+- Rewrote `README.md` with complete clean-clone instructions: install deps, copy env, run migrations, seed, start server, start client, run tests.
+- Appended this prompt history entry.
+- Marked all sub-tasks and parent task 21 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.

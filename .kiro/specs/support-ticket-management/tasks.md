@@ -235,17 +235,17 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - Global error boundary rendering `ErrorMessage` for network failures ("Unable to connect to server. Check your connection.") and 5xx ("Something went wrong. Please try again later.")
   - _Requirements: 10.1, 10.3_
 
-- [ ] 21. Project documentation and hygiene
-  - [ ] 21.1 Create `.gitignore` at repo root excluding `node_modules/`, `.env`, `.env.local`, `*.db`, `*.db-journal`, `dist/`, `build/`
+- [x] 21. Project documentation and hygiene
+  - [x] 21.1 Create `.gitignore` at repo root excluding `node_modules/`, `.env`, `.env.local`, `*.db`, `*.db-journal`, `dist/`, `build/`
     - _Requirements: 11.3, 11.4_
 
-  - [ ] 21.2 Create `.env.example` at repo root and in `server/` documenting `DATABASE_URL`, `PORT`, and any client vars (`VITE_API_URL`)
+  - [x] 21.2 Create `.env.example` at repo root and in `server/` documenting `DATABASE_URL`, `PORT`, and any client vars (`VITE_API_URL`)
     - _Requirements: 11.2, 11.3_
 
-  - [ ] 21.3 Write `README.md` at repo root with step-by-step instructions from clean clone: install deps in root/client/server, copy `.env.example` to `.env`, run `prisma migrate dev`, run seed, start server, start client, run tests
+  - [x] 21.3 Write `README.md` at repo root with step-by-step instructions from clean clone: install deps in root/client/server, copy `.env.example` to `.env`, run `prisma migrate dev`, run seed, start server, start client, run tests
     - _Requirements: 11.1_
 
-  - [ ] 21.4 Append entry to `PROMPT_HISTORY.md` for each spec-driven prompt exchange completed during implementation
+  - [x] 21.4 Append entry to `PROMPT_HISTORY.md` for each spec-driven prompt exchange completed during implementation
     - _Requirements: 11.1_
 
 - [ ] 22. Final checkpoint
