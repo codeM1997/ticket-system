@@ -248,7 +248,7 @@ Bottom-up build: repo scaffold → database layer → state machine + validation
   - [x] 21.4 Append entry to `PROMPT_HISTORY.md` for each spec-driven prompt exchange completed during implementation
     - _Requirements: 11.1_
 
-- [ ] 22. Final checkpoint
+- [x] 22. Final checkpoint
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

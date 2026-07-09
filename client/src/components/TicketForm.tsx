@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useMemo, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCreateTicket, useUpdateTicket, useUsers } from "../hooks/useTickets";
 import { ApiError } from "../api/tickets";
@@ -55,7 +55,7 @@ export function TicketForm({ mode, ticket }: TicketFormProps) {
     return errs;
   }
 
-  const fieldErrors = validate();
+  const fieldErrors = useMemo(() => validate(), [title, description, priority, createdBy, mode]);
   const hasErrors = Object.keys(fieldErrors).length > 0;
 
   function handleSubmit(e: FormEvent) {

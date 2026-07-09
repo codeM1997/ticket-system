@@ -9,7 +9,7 @@ const commentsRouter = Router({ mergeParams: true });
 
 // POST /api/tickets/:id/comments — add comment to ticket.
 // Requirements: 6.1, 6.2, 9.2
-commentsRouter.post("/", async (req, res, next) => {
+commentsRouter.post("/", async (req: { params: { id: string }; body: any }, res, next) => {
   try {
     // Validate payload first (cheap, no DB call) before checking existence.
     const errors = validateCommentCreate(req.body ?? {});

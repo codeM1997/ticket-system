@@ -1542,7 +1542,7 @@ This file records every user prompt submitted during spec-driven development of 
 
 ---
 
-## Prompt — Execute Task 21: Project Documentation and Hygiene
+## Prompt 90 — Execute Task 21: Project Documentation and Hygiene
 
 **Date:** 2026-07-09
 
@@ -1558,3 +1558,82 @@ This file records every user prompt submitted during spec-driven development of 
 - Marked all sub-tasks and parent task 21 as completed in `tasks.md`.
 
 **User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 91 — Execute Task 22: Final Checkpoint
+
+**Date:** 2026-07-09
+
+**Prompt (summarised):**
+> User asked to execute task 22 from the spec tasks.md — "Final checkpoint". Task required ensuring all tests pass and flagging any issues.
+
+**Kiro output:**
+- Ran `npm test` in `server/` — 11 test files, 88 tests, all passed.
+- Ran `npx tsc --noEmit` in `server/` — found 2 type errors in `comments.ts` (`req.params.id` typed as `{}` due to `mergeParams`); fixed by adding explicit param typing.
+- Re-ran server tests after fix — still 88/88 green.
+- Ran `npx tsc --noEmit` in `client/` — clean, no errors.
+- Client has no test files (optional tasks 17.1/18.1/19.1 skipped per spec).
+- Marked task 22 as completed in `tasks.md`.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 92 — Full Code Review of Client and Server
+
+**Date:** 2026-07-09
+
+**Prompt (summarised):**
+> User invoked `/caveman-review` requesting a terse code review of both the client and server codebases.
+
+**Kiro output:**
+- Reviewed all server source files (index.ts, errors.ts, validation.ts, stateMachine.ts, prisma.ts, routes/tickets.ts, routes/comments.ts, routes/users.ts) and all client source files (App.tsx, api/tickets.ts, hooks/useTickets.ts, types/index.ts, and all components).
+- Findings summary:
+  - 🟡 risk: In-memory search filter in `GET /api/tickets` fetches all rows then filters in JS — won't scale.
+  - 🟡 risk: `ErrorBoundary` uses fragile `err.message.includes("network")` string matching instead of checking `ApiError.status === 0`.
+  - 🟡 risk: `handleReset` in ErrorBoundary doesn't clear React Query cache — stale error re-throws immediately.
+  - 🟡 risk: `DATABASE_URL` fallback uses relative path; CWD-dependent.
+  - 🟡 risk: `CommentForm` `useMemo` deps missing `validate` closure reference.
+  - 🟡 risk: `TicketForm` calls `validate()` on every render without memoization.
+  - 🟡 risk: `process.argv[1]` guard for auto-start can mismatch under symlinks.
+  - 🔵 nit: `VALID_TRANSITIONS` duplicated between server and client `TransitionButtons.tsx`.
+  - 🔵 nit: Manual `req` type in comments route loses Express `Request` properties.
+  - 🔵 nit: Multiple Prisma error checks could be combined with switch.
+  - 🔵 nit: `VALID_TRANSITIONS` typed as `Record<string, string[]>` instead of a strict `Status` union.
+  - No showstoppers found.
+
+**User review & changes:** Pending — findings presented for user decision.
+
+---
+
+## Prompt 93 — Fix Review Findings: ErrorBoundary Cache Reset and TicketForm Memoization
+
+**Date:** 2026-07-09
+
+**Prompt (summarised):**
+> User asked to fix two code review findings: (1) App.tsx ErrorBoundary `handleReset` doesn't clear React Query cache causing stale errors to re-throw, and (2) TicketForm.tsx calls `validate()` on every render without memoization.
+
+**Kiro output:**
+- `App.tsx`: Added `QueryErrorResetBoundary` wrapper from `@tanstack/react-query`. ErrorBoundary now accepts an `onReset` prop that calls the boundary's `reset()` function, clearing stale errored queries before re-rendering children.
+- `TicketForm.tsx`: Added `useMemo` import; wrapped `validate()` call in `useMemo(() => validate(), [title, description, priority, createdBy, mode])` so validation only re-runs when relevant inputs change.
+- Server tests: 88/88 pass.
+- Client TypeScript: compiles clean, no diagnostics.
+
+**User review & changes:** None — accepted as-is.
+
+---
+
+## Prompt 94 — Git Status and Commit Message Generation
+
+**Date:** 2026-07-09
+
+**Prompt (summarised):**
+> User ran `git status` and invoked `/caveman-commit` to generate a commit message for the current unstaged changes (task 22 completion, review fixes to App.tsx, TicketForm.tsx, comments.ts, and prompt history updates).
+
+**Kiro output:**
+- Ran `git status` showing 5 modified unstaged files.
+- Generated Conventional Commits message: `fix: resolve review findings and complete final checkpoint` with body listing QueryErrorResetBoundary wrap, useMemo validation, req.params typing, and task 22 completion.
+- Asked user whether to stage and commit.
+
+**User review & changes:** Pending — awaiting user confirmation to commit.

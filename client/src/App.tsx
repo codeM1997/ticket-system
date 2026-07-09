@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route, Link, useParams } from "react-router-dom";
+import { QueryErrorResetBoundary } from "@tanstack/react-query";
 import { TicketList } from "./components/TicketList";
 import { TicketForm } from "./components/TicketForm";
 import { TicketDetail } from "./components/TicketDetail";
@@ -16,10 +17,10 @@ interface ErrorBoundaryState {
 }
 
 class ErrorBoundary extends React.Component<
-  React.PropsWithChildren<unknown>,
+  React.PropsWithChildren<{ onReset?: () => void }>,
   ErrorBoundaryState
 > {
-  constructor(props: React.PropsWithChildren<unknown>) {
+  constructor(props: React.PropsWithChildren<{ onReset?: () => void }>) {
     super(props);
     this.state = { hasError: false, message: "" };
   }
@@ -56,6 +57,7 @@ class ErrorBoundary extends React.Component<
 
   handleReset = () => {
     this.setState({ hasError: false, message: "" });
+    this.props.onReset?.();
   };
 
   render() {
@@ -90,21 +92,25 @@ function EditTicketRoute() {
 
 function App() {
   return (
-    <ErrorBoundary>
-      <div style={{ maxWidth: "960px", margin: "0 auto", padding: "1rem" }}>
-        <h1>Support Ticket Management</h1>
-        <nav style={{ marginBottom: "1rem" }}>
-          <Link to="/">Tickets</Link>{" | "}
-          <Link to="/tickets/new">New Ticket</Link>
-        </nav>
-        <Routes>
-          <Route path="/" element={<TicketList />} />
-          <Route path="/tickets/new" element={<TicketForm mode="create" />} />
-          <Route path="/tickets/:id" element={<TicketDetail />} />
-          <Route path="/tickets/:id/edit" element={<EditTicketRoute />} />
-        </Routes>
-      </div>
-    </ErrorBoundary>
+    <QueryErrorResetBoundary>
+      {({ reset }) => (
+        <ErrorBoundary onReset={reset}>
+          <div style={{ maxWidth: "960px", margin: "0 auto", padding: "1rem" }}>
+            <h1>Support Ticket Management</h1>
+            <nav style={{ marginBottom: "1rem" }}>
+              <Link to="/">Tickets</Link>{" | "}
+              <Link to="/tickets/new">New Ticket</Link>
+            </nav>
+            <Routes>
+              <Route path="/" element={<TicketList />} />
+              <Route path="/tickets/new" element={<TicketForm mode="create" />} />
+              <Route path="/tickets/:id" element={<TicketDetail />} />
+              <Route path="/tickets/:id/edit" element={<EditTicketRoute />} />
+            </Routes>
+          </div>
+        </ErrorBoundary>
+      )}
+    </QueryErrorResetBoundary>
   );
 }
 
